@@ -8,10 +8,9 @@ import { toast } from "sonner";
 
 type Props = {
   productId: string;
-  storeId: string;
 };
 
-const SaveToWishlist = ({ productId, storeId }: Props) => {
+const SaveToWishlist = ({ productId}: Props) => {
   const [isPending, startTransition] = useTransition();
 
   const { user } = useUserStore();
@@ -31,11 +30,11 @@ const SaveToWishlist = ({ productId, storeId }: Props) => {
           token: user?.token!,
           wishList: {
             productId,
-            storeId,
           },
         });
         toast.success("Added to wishlist");
       } catch (error) {
+        console.log(createWishListError)
         toast.success(
           `Operation Unsuccessful: ${createWishListError?.message}`
         );

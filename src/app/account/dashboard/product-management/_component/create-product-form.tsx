@@ -96,11 +96,11 @@ export function CreateProductForm() {
       name: "",
       description: "",
       category: "",
-      price: 0,
+      // price: 0,
       compareAtPrice: undefined,
       imageFiles: [],
       inventory: {
-        quantity: 0,
+        // quantity: 0,
         sku: "",
         lowStockThreshold: 5,
       },
@@ -132,8 +132,8 @@ export function CreateProductForm() {
     resolver: zodResolver(variantSchema),
     defaultValues: {
       name: "",
-      price: 0,
-      quantity: 0,
+      // price: 0,
+      // quantity: 0,
       sku: "",
     },
   });

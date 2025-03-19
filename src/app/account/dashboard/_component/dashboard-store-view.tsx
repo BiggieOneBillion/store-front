@@ -34,6 +34,7 @@ const cardInfo: cardData = [
 
 const DashboardStoreView = () => {
   return (
+    
     <section className="space-y-10">
       {/* overview cards */}
       <section className="w-full grid grid-cols-4 gap-5">

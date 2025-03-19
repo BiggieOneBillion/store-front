@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,12 +24,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Switch } from "@/components/ui/switch";
 import { Store } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserStore } from "@/store/user-store";
 import { useRouter } from "next/navigation";
-import { useStore } from "@/hooks/useStore";
 
 // Define validation schema using Zod
 const formSchema = z
@@ -39,7 +36,6 @@ const formSchema = z
       .string()
       .min(2, { message: "Name must be at least 2 characters long" }),
     email: z.string().email({ message: "Invalid email address" }),
-    isSeller: z.boolean(),
     phoneNumber: z
       .string()
       .min(11, { message: "Phone number must be 11 digits" })
@@ -64,28 +60,23 @@ export default function RegisterForm() {
       password: "",
       confirmPassword: "",
       phoneNumber: "",
-      isSeller: false,
     },
   });
-
-  const { user } = useUserStore();
 
   const { register, isRegistering, registerError } = useAuth();
 
   const setUser = useUserStore((state) => state.setUser);
-
-  const { createStore, isCreatingStore, createStoreError } = useStore();
 
   const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       // Assuming an async registration function
-      const { confirmPassword, isSeller, ...others } = values;
+      const { confirmPassword, ...others } = values;
       // register the user
       const response = await register({
         ...others,
-        role: isSeller ? "seller" : "buyer",
+        role: "buyer",
       });
 
       setUser({
@@ -103,7 +94,7 @@ export default function RegisterForm() {
       console.error("Form submission error", error);
       toast.error(
         `Error Registering ${
-          registerError?.message || createStoreError?.message
+          registerError?.message
         }`
       );
     }
@@ -225,35 +216,7 @@ export default function RegisterForm() {
                   )}
                 />
 
-                {/* isSeller */}
-                <FormField
-                  control={form.control}
-                  name="isSeller"
-                  render={({ field }) => (
-                    <FormItem className="flexY hidden flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel>Click to register as seller</FormLabel>
-                        <FormDescription className="flex flex-col">
-                          <span>
-                            You can create stores and sell your products
-                          </span>
-                          <span className="underline underline-offset-1 text-black font-medium">
-                            Terms and conditions apply
-                          </span>
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          //   disabled
-                          aria-readonly
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
+            
                 <Button
                   type="submit"
                   className="w-full"

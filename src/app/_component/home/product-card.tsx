@@ -40,21 +40,18 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.category}
             </Badge>
             {user?.role === "buyer" && (
-              <SaveToWishlist
-                productId={product.id}
-                storeId={product.store.id}
-              />
+              <SaveToWishlist productId={product.id} />
             )}
           </div>
           <p className="text-lg font-bold">${product.price!.toFixed(2)}</p>
         </div>
         <h3 className="font-medium mb-1">{product.name}</h3>
         <div className="mb-4">
-          <p className="text-sm text-muted-foreground">{product.store.name}</p>
+          {/* <p className="text-sm text-muted-foreground">{product.store.name}</p> */}
         </div>
         <button
           onClick={handleAddToCart}
-          disabled={user?.role === "seller"}
+          disabled={user?.role !== "buyer"}
           className="flex w-full py-2 bg-slate-900 disabled:bg-slate-600 disabled:cursor-none text-white border rounded-md items-center justify-center gap-1 text-sm"
         >
           Add To Cart

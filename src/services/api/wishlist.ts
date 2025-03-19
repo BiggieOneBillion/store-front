@@ -7,7 +7,6 @@ const user = useUserStore.getState().user;
 
 export interface IWishList {
   productId: string;
-  storeId: string;
 }
 
 export const getUserWishList = async (userId: string, token: string) => {
@@ -33,11 +32,11 @@ export const addWishList = async (wishList: IWishList, token: string) => {
 // for removing specific product from wishlist
 export const deleteUserWishList = async (params: {
   productId: string;
-  storeId: string;
+  // storeId: string;
   token: string;
 }) => {
   const response = await api.delete(
-    `${baseURL}/${params.productId}/${params.storeId}`,
+    `${baseURL}/${params.productId}`,
     {
       headers: {
         Authorization: `Bearer ${params.token}`,

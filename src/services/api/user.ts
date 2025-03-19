@@ -57,3 +57,13 @@ export const deleteUserDetails = async (params: {
 
   return response.data;
 };
+
+export const getAllUsers = async (token: string) => {
+  const response = await api.get(`${baseURL}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};

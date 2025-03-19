@@ -23,7 +23,7 @@ export const useWishList = () => {
   } = useMutation({
     mutationFn: async (params: {
       productId: string;
-      storeId: string;
+      // storeId: string;
       token: string;
     }) => deleteUserWishList(params),
   });
