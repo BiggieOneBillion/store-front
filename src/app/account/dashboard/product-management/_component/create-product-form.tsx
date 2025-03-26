@@ -41,6 +41,15 @@ import {
 import { useProduct } from "@/hooks/useProduct";
 import { useUserStore } from "@/store/user-store";
 import { toast } from "sonner";
+import { getCategories } from "@/services/api/categories";
+import { useQuery } from "@tanstack/react-query";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  status: "active" | "inactive";
+}
 
 const variantSchema = z.object({
   name: z.string().min(1, "Variant name is required"),
@@ -59,6 +68,7 @@ const productSchema = z.object({
   description: z.string().min(1, "Description is required"),
   category: z.string().min(1, "Category is required"),
   price: z.number().min(0, "Price must be a positive number"),
+  tag: z.enum(["latest", "featured", "regular", "sale"]).default("regular"),
   compareAtPrice: z
     .number()
     .min(0, "Compare at price must be a positive number")
@@ -96,6 +106,7 @@ export function CreateProductForm() {
       name: "",
       description: "",
       category: "",
+      tag: "regular",
       // price: 0,
       compareAtPrice: undefined,
       imageFiles: [],
@@ -149,6 +160,7 @@ export function CreateProductForm() {
 
     const input = {
       name: productData.name,
+      tag: productData.tag,
       description: productData.description,
       category: productData.category,
       price: productData.price,
@@ -184,6 +196,16 @@ export function CreateProductForm() {
       });
     }
   }
+
+  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery<
+    Category[]
+  >({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await getCategories({ token: user?.token! });
+      return res.results;
+    },
+  });
 
   function onVariantSubmit(
     data: z.infer<typeof variantSchema>,
@@ -274,9 +296,68 @@ export function CreateProductForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter product category" {...field} />
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isCategoriesLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isCategoriesLoading ? (
+                          <SelectItem value="Loading categories">
+                            Loading categories...
+                          </SelectItem>
+                        ) : categories.length === 0 ? (
+                          <SelectItem value="">
+                            No categories available
+                          </SelectItem>
+                        ) : (
+                          categories
+                            ?.filter((category) => category.status === "active")
+                            .map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Select a category for your product
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="tag"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Tag</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a tag" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="latest">Latest</SelectItem>
+                        <SelectItem value="featured">Featured</SelectItem>
+                        <SelectItem value="regular">Regular</SelectItem>
+                        <SelectItem value="sale">Sale</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Select a tag to categorize your product
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

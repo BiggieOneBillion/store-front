@@ -21,25 +21,36 @@ export type Product = {
   id: string;
   name: string;
   description: string;
-  store: {
-    name: string;
-    id: string;
-  };
-  category: string;
+  store: string;
+  category: { name: string; id: string };
   price: number;
   compareAtPrice?: number;
   images: string[];
+  tag: "latest" | "featured" | "regular" | "sale";
   inventory: {
     quantity: number;
     sku: string;
     lowStockThreshold: number;
   };
+  discount?: {
+    type?: "percentage" | "fixed";
+    value?: number;
+    active?: boolean;
+    startDate?: string;
+    endDate?: string;
+  };
   variants: Array<{
+    _id: string;
     name: string;
     options: string[];
     price: number;
     quantity: number;
     sku: string;
+    discount: {
+      type: "percentage" | "fixed";
+      value: number;
+      active: boolean;
+    };
   }>;
   specifications: Array<{
     name: string;
@@ -48,8 +59,6 @@ export type Product = {
   status: "active" | "inactive" | "out_of_stock";
   rating: number;
   totalRatings: number;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export const columns: ColumnDef<Product>[] = [
@@ -158,7 +167,7 @@ export const columns: ColumnDef<Product>[] = [
     },
   },
   {
-    accessorKey: "category",
+    accessorKey: "category.name",
     header: "Category",
   },
   //   {
@@ -218,7 +227,8 @@ export const columns: ColumnDef<Product>[] = [
             <EditProductDialog
               productId={product.id}
               data={{
-                category: product.category,
+                category: product.category.name,
+                categoryId: product.category.id,
                 name: product.name,
                 description: product.description,
                 price: product.price,
@@ -227,6 +237,11 @@ export const columns: ColumnDef<Product>[] = [
                 compareAtPrice: product.compareAtPrice,
                 specifications: product.specifications,
                 variants: product.variants,
+                tag: product.tag.toLowerCase() as
+                  | "latest"
+                  | "featured"
+                  | "regular"
+                  | "sale",
                 // imageFiles: [product.images],
               }}
             />

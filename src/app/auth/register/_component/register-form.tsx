@@ -79,11 +79,13 @@ export default function RegisterForm() {
         role: "buyer",
       });
 
+      console.log(response)
+
       setUser({
-        id: response.user.id,
-        name: response.user.name,
-        role: response.user.role,
-        email: response.user.email,
+        id: response.newUser.id,
+        name: response.newUser.name,
+        role: response.newUser.role,
+        email: response.newUser.email,
         token: response.tokens.access.token,
         refreshToken: response.tokens.refresh.token,
       });

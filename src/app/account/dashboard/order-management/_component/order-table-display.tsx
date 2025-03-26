@@ -54,7 +54,6 @@ type Order = {
   createdAt: string;
 };
 
-
 type ModalType = "user" | "items" | null;
 
 export function OrderTableDisplay({ orders }: { orders: Order[] }) {
@@ -85,52 +84,58 @@ export function OrderTableDisplay({ orders }: { orders: Order[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {orders.map((order) => (
-            <TableRow key={order._id}>
-              <TableCell>#{order._id.slice(-6)}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <span>{order.buyer.name}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => handleOpenModal("user", order)}
+          {orders.length > 0 ? (
+            orders.map((order) => (
+              <TableRow key={order._id}>
+                <TableCell>#{order._id.slice(-6)}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{order.buyer.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => handleOpenModal("user", order)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <span>{order.items.length} items</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => handleOpenModal("items", order)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+                <TableCell>₦{order.total.toLocaleString()}</TableCell>
+                <TableCell>
+                  <Badge
+                    className={
+                      order.status === "completed"
+                        ? "bg-green-500"
+                        : order.status === "processing"
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    }
                   >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <span>{order.items.length} items</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={() => handleOpenModal("items", order)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-              <TableCell>₦{order.total.toLocaleString()}</TableCell>
-              <TableCell>
-                <Badge
-                  className={
-                    order.status === "completed"
-                      ? "bg-green-500"
-                      : order.status === "processing"
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  }
-                >
-                  {order.status}
-                </Badge>
-              </TableCell>
-              <TableCell>{format(new Date(order.createdAt), "MMM dd, yyyy")}</TableCell>
-            </TableRow>
-          ))}
+                    {order.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {format(new Date(order.createdAt), "MMM dd, yyyy")}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">Hello boss</p>
+          )}
         </TableBody>
       </Table>
 
@@ -154,11 +159,19 @@ export function OrderTableDisplay({ orders }: { orders: Order[] }) {
                 </div>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Shipping Address</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Shipping Address
+                </p>
                 <div className="text-sm">
                   <p>{selectedOrder.shippingAddress.street}</p>
-                  <p>{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state}</p>
-                  <p>{selectedOrder.shippingAddress.country}, {selectedOrder.shippingAddress.zipCode}</p>
+                  <p>
+                    {selectedOrder.shippingAddress.city},{" "}
+                    {selectedOrder.shippingAddress.state}
+                  </p>
+                  <p>
+                    {selectedOrder.shippingAddress.country},{" "}
+                    {selectedOrder.shippingAddress.zipCode}
+                  </p>
                 </div>
               </div>
             </div>
@@ -166,10 +179,15 @@ export function OrderTableDisplay({ orders }: { orders: Order[] }) {
           {modalType === "items" && selectedOrder && (
             <div className="space-y-4">
               {selectedOrder.items.map((item) => (
-                <div key={item.product} className="flex items-center justify-between py-2 border-b last:border-0">
+                <div
+                  key={item.product}
+                  className="flex items-center justify-between py-2 border-b last:border-0"
+                >
                   <div>
                     <p className="font-medium">{item.productName}</p>
-                    <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Quantity: {item.quantity}
+                    </p>
                   </div>
                   <p className="font-medium">₦{item.price.toLocaleString()}</p>
                 </div>

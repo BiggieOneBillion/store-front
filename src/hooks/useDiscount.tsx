@@ -1,4 +1,10 @@
-import { createDiscount, Discount } from "@/services/api/discount";
+import {
+  createDiscount,
+  deactiveteDiscount,
+  deleteDiscount,
+  Discount,
+  updateDiscount,
+} from "@/services/api/discount";
 import { useMutation } from "@tanstack/react-query";
 
 export const useDiscount = () => {
@@ -11,43 +17,52 @@ export const useDiscount = () => {
       createDiscount(params),
   });
 
-//   const {
-//     mutateAsync: updateProductFn,
-//     isPending: isUpdatingProduct,
-//     error: updateProductError,
-//   } = useMutation({
-//     mutationFn: async (params: {
-//       token: string;
-//       data: Partial<IProduct>;
-//       userId: string;
-//       productId: string;
-//     }) => updateProduct(params),
-//   });
+  const {
+    mutateAsync: updateDiscountFn,
+    isPending: isUpdatingDiscount,
+    error: updateDiscountError,
+  } = useMutation({
+    mutationFn: async (params: {
+      token: string;
+      data: Partial<Discount>;
+      id: string;
+    }) => updateDiscount(params),
+  });
 
-//   const {
-//     mutateAsync: deleteProductFn,
-//     isPending: isDeletingProduct,
-//     error: deleteProductError,
-//   } = useMutation({
-//     mutationFn: async (params: {
-//       token: string;
-//       userId: string;
-//       productId: string;
-//     }) => deleteProduct(params),
-//   });
+  const {
+    mutateAsync: deactivateDiscountFn,
+    isPending: isDeactivatingDiscount,
+    error: deactivateDiscountError,
+  } = useMutation({
+    mutationFn: async (params: {
+      token: string;
+      id: string;
+      status: boolean;
+    }) => deactiveteDiscount(params),
+  });
+
+  const {
+    mutateAsync: deleteDiscountFn,
+    isPending: isDeletingDiscount,
+    error: deleteDiscountError,
+  } = useMutation({
+    mutationFn: async (params: { token: string; id: string }) =>
+      deleteDiscount(params),
+  });
 
   return {
     // create store
     createDiscountFn,
     isCreatingDiscount,
     createDiscountError,
-    // update store values
-    // updateProductFn,
-    // isUpdatingProduct,
-    // updateProductError,
-    // delete product
-    // deleteProductFn,
-    // isDeletingProduct,
-    // deleteProductError,
+    updateDiscountFn,
+    isUpdatingDiscount,
+    updateDiscountError,
+    deactivateDiscountFn,
+    isDeactivatingDiscount,
+    deactivateDiscountError,
+    deleteDiscountFn,
+    isDeletingDiscount,
+    deleteDiscountError,
   };
 };

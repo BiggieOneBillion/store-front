@@ -58,7 +58,7 @@ export function SidebarNav() {
     {
       href: "/account/dashboard/category-management",
       icon:  TableOfContents,
-      label: "Purchase",
+      label: "Category",
     },
   ];
 

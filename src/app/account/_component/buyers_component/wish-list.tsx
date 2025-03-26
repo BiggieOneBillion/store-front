@@ -2,22 +2,20 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ToolTip } from "@/global-components/tool-tip";
 import { getUserWishList } from "@/services/api/wishlist";
 import { useUserStore } from "@/store/user-store";
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingCart, Trash2 } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { v4 } from "uuid";
 import { DeleteWishListItemModal } from "./delete-wish-list-item-modal";
-import { Button } from "@/components/ui/button";
 import { ClearWishListModal } from "./clear-wish-list-modal";
 
 type SimpleProduct = {
   images: string[];
   name: string;
   description: string;
-  category: string;
+  category: { name: string };
   price: number;
   id: string;
 };
@@ -59,6 +57,10 @@ const WishList = () => {
     return <p>Error while fetching wish list</p>;
   }
 
+  if (!data) {
+    return <p>No data</p>;
+  }
+
   return (
     <section className="mt-2">
       <div>
@@ -96,7 +98,7 @@ const WishList = () => {
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary" className="mb-2">
-                        {el.product.category}
+                        {el.product.category.name}
                       </Badge>
                     </div>
                     <p className="text-lg font-bold">

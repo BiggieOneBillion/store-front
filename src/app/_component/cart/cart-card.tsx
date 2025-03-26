@@ -13,10 +13,10 @@ interface CartItem {
   price: number;
   images: string[];
   quantity: number;
-  store: {
-    id: string;
-    name: string;
-  };
+  // store: {
+  //   id: string;
+  //   name: string;
+  // };
 }
 
 interface CartCardProps {
@@ -25,6 +25,7 @@ interface CartCardProps {
 }
 
 export function CartCard({ item, onRemove }: CartCardProps) {
+  console.log("CART ITEMS", item);
   const { updateQuantity } = useCartStore();
 
   const handleIncrease = () => {
@@ -44,7 +45,7 @@ export function CartCard({ item, onRemove }: CartCardProps) {
       <CardContent className="p-4 flex flex-col sm:flex-row items-center">
         <div className="relative w-24 h-24 mr-4 mb-4 sm:mb-0">
           <Image
-            src={"/grid-img-6.jpg"}
+            src={item.images[0] || "/grid-img-6.jpg"}
             alt={item.name}
             fill
             className="object-cover rounded-md"
@@ -52,9 +53,6 @@ export function CartCard({ item, onRemove }: CartCardProps) {
         </div>
         <div className="flex-1">
           <h3 className="font-semibold mb-1">{item.name}</h3>
-          <p className="text-sm text-muted-foreground mb-2">
-            Sold by: {item.store.name}
-          </p>
           <div className="flex items-baseline gap-2 mb-2">
             <p className="font-semibold">
               ${(item.price * item.quantity).toFixed(2)}

@@ -3,8 +3,6 @@ import api from "@/lib/api";
 
 const baseURL = "/categories";
 
-
-
 export const createCategory = async (params: {
   token: string;
   data: CategoryFormValues;
@@ -15,6 +13,7 @@ export const createCategory = async (params: {
     {
       headers: {
         Authorization: `Bearer ${params.token}`,
+        "Content-Type": "multipart/form-data",
       },
     }
   );
@@ -22,13 +21,15 @@ export const createCategory = async (params: {
 };
 
 export const getCategories = async (params: { token: string }) => {
-  const response = await api.get(
-    `${baseURL}`,
-    {
-      headers: {
-        Authorization: `Bearer ${params.token}`,
-      },
-    }
-  );
+  const response = await api.get(`${baseURL}`, {
+    headers: {
+      Authorization: `Bearer ${params.token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getCategory = async () => {
+  const response = await api.get(`${baseURL}`);
   return response.data;
 };

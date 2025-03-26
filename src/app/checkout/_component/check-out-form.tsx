@@ -115,7 +115,6 @@ export function CheckoutForm({ goToBilling }: Props) {
       items: cart.map((el) => {
         return {
           product: el.id,
-          store: el.store.id,
           quantity: el.quantity,
         };
       }),

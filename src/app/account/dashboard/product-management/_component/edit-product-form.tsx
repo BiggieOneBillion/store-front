@@ -41,7 +41,15 @@ import {
 import { useProduct } from "@/hooks/useProduct";
 import { useUserStore } from "@/store/user-store";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getCategories } from "@/services/api/categories";
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  status: "active" | "inactive";
+}
 
 const variantSchema = z.object({
   name: z.string().min(1, "Variant name is required"),
@@ -60,6 +68,7 @@ const productSchema = z.object({
   description: z.string().min(1, "Description is required"),
   category: z.string().min(1, "Category is required"),
   price: z.number().min(0, "Price must be a positive number"),
+  tag: z.enum(["latest", "featured", "regular", "sale"]).default("regular"),
   compareAtPrice: z
     .number()
     .min(0, "Compare at price must be a positive number")
@@ -86,7 +95,7 @@ const productSchema = z.object({
 export type ProductFormValues = z.infer<typeof productSchema>;
 
 type Props = {
-  data: Partial<ProductFormValues>;
+  data: Partial<ProductFormValues> & { categoryId: string };
   productId: string;
 };
 
@@ -105,6 +114,7 @@ export function EditProductForm({ data, productId }: Props) {
     defaultValues: {
       ...data,
       imageFiles: [],
+      tag: data?.tag!,
     },
   });
 
@@ -134,13 +144,22 @@ export function EditProductForm({ data, productId }: Props) {
 
   async function onSubmit(values: ProductFormValues) {
     const productData = { ...values, variants };
-    // console.log(productData);
+
+    let categoryValue: string;
+
+    if (productData.category !== data.category) {
+      categoryValue = productData.category;
+    } else {
+      categoryValue = data.categoryId!;
+      console.log(categoryValue);
+    }
 
     const input = {
       name: productData.name,
       description: productData.description,
-      category: productData.category,
+      category: categoryValue,
       price: productData.price,
+      tag: productData.tag,
       compareAtPrice: productData.compareAtPrice,
       images: [productData.imageFiles[0]],
       inventory: {
@@ -159,6 +178,8 @@ export function EditProductForm({ data, productId }: Props) {
         value: el.value,
       })),
     };
+
+    console.log(input);
 
     try {
       await updateProductFn({
@@ -219,6 +240,18 @@ export function EditProductForm({ data, productId }: Props) {
     }
   }
 
+  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery<
+    Category[]
+  >({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await getCategories({ token: user?.token! });
+      return res.results;
+    },
+  });
+
+  console.log(data);
+
   return (
     <Form {...form}>
       <form
@@ -259,7 +292,65 @@ export function EditProductForm({ data, productId }: Props) {
                   </FormItem>
                 )}
               />
+              {isCategoriesLoading && <p>Loading categories...</p>}
+
+              {/* {categories && categories.length > 0 && ( */}
               <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <div className="flex items-center  gap-2">
+                        <p>Category</p>
+                        <span className="ml-auto text-xs text-gray-600 underline">
+                          previous value
+                        </span>
+                        <span className="text-sm bg-teal-700 px-1 text-white rounded">
+                          {data.category}
+                        </span>
+                      </div>
+                    </FormLabel>
+
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isCategoriesLoading}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={"Select your category"} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isCategoriesLoading ? (
+                          <SelectItem value="Loading categories">
+                            Loading categories...
+                          </SelectItem>
+                        ) : categories.length === 0 ? (
+                          <SelectItem value="">
+                            No categories available
+                          </SelectItem>
+                        ) : (
+                          categories && Array.isArray(categories) && categories 
+                            .filter((category) => category.status === "active")
+                            .map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Select a category for your product
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* )} */}
+              {/* <FormField
                 control={form.control}
                 name="category"
                 render={({ field }) => (
@@ -268,6 +359,42 @@ export function EditProductForm({ data, productId }: Props) {
                     <FormControl>
                       <Input placeholder="Enter product category" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              /> */}
+              <FormField
+                control={form.control}
+                name="tag"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <div className="flex items-center  gap-2">
+                        <p>Product Tag</p>
+                        <span className="ml-auto text-xs text-gray-600 underline">
+                          previous value
+                        </span>
+                        <span className="text-sm bg-teal-700 capitalize px-1 text-white rounded">
+                          {data.tag}
+                        </span>
+                      </div>
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={data.tag}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={"Select Product Tag"} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="latest">Latest</SelectItem>
+                        <SelectItem value="featured">Featured</SelectItem>
+                        <SelectItem value="regular">Regular</SelectItem>
+                        <SelectItem value="sale">Sale</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

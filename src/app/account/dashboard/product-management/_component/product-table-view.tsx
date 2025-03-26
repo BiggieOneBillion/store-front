@@ -33,6 +33,8 @@ export default function ProductsTableView() {
     queryFn: async () => await getStoreProducts(user?.id!, user?.token!),
   });
 
+  // console.log(data)
+
   return (
     <Card>
       <CardHeader>

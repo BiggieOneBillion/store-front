@@ -1,3 +1,4 @@
+
 import { Product } from "@/app/account/dashboard/product-management/_component/columns";
 import api from "@/lib/api";
 
@@ -27,6 +28,16 @@ export interface IProduct {
     value: string;
   }[];
 }
+
+export const getProductDetails = async (id: string, token: string) => {
+  const response = await api.get(`${baseURL}/detail/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
 
 export const getStoreProducts = async (userId: string, token: string) => {
   const response = await api.get(`${baseURL}/${userId}`, {

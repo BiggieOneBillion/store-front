@@ -25,16 +25,16 @@ const Navbar = () => {
           Home
         </Link>
         <Link
-          href={"/"}
+          href={"/categories"}
           className="py-1 px-2 rounded-md bg-gray-50 hover:bg-slate-100 transition-colors duration-200"
         >
           Categories
         </Link>
         <Link
-          href={"/"}
+          href={"/shop"}
           className="py-1 px-2 rounded-md bg-gray-50 hover:bg-slate-100 transition-colors duration-200"
         >
-          Shops
+          Shop
         </Link>
         <Link
           href={"/"}
@@ -56,7 +56,7 @@ const Navbar = () => {
             <Search size={17} />
           </button>
         </div>
-        {user?.role === "buyer" && (
+        {(
           <ToolTip message="cart">
             <CartSheet />
           </ToolTip>

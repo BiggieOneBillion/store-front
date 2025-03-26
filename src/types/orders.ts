@@ -5,7 +5,7 @@ interface Variant {
 
 interface OrderItem {
   product: string;
-  store: string;
+  // store: string;
   quantity: number;
   price?: number;
   variant?: Variant;

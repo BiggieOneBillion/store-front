@@ -20,7 +20,20 @@ import { UseFormReturn } from "react-hook-form";
 import { DiscountFormValues } from "../types";
 import { useUserStore } from "@/store/user-store";
 import { getDiscount } from "@/services/api/discount";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useDiscount } from "@/hooks/useDiscount";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Discount {
   usageLimit: {
@@ -45,12 +58,22 @@ interface Discount {
   id: string;
 }
 
-export function DiscountsTable({ form }: DiscountsTableProps) {
+export function DiscountsTable({ form, setEditingId, setIsEditing }: DiscountsTableProps) {
   const { user } = useUserStore();
   const { data: discounts = [], isLoading } = useQuery<Discount[]>({
     queryKey: ["discount-table"],
     queryFn: async () => getDiscount({ token: user?.token! }),
   });
+
+  const queryClient = useQueryClient();
+
+  const {
+    deleteDiscountFn,
+    deleteDiscountError,
+    isDeletingDiscount,
+    deactivateDiscountFn,
+    deactivateDiscountError,
+  } = useDiscount();
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -61,7 +84,11 @@ export function DiscountsTable({ form }: DiscountsTableProps) {
     const isFormEmpty = !formValues.code && !formValues.value;
 
     if (!isFormEmpty) {
-      if (confirm("The create discount form has unsaved changes. Do you want to discard them?")) {
+      if (
+        confirm(
+          "The create discount form has unsaved changes. Do you want to discard them?"
+        )
+      ) {
         populateForm(discount);
       }
     } else {
@@ -83,6 +110,38 @@ export function DiscountsTable({ form }: DiscountsTableProps) {
       conditions: discount.conditions,
       applicableTo: discount.applicableTo,
     });
+    setIsEditing(true);
+    setEditingId(discount.id);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDiscountFn({ token: user?.token!, id });
+      queryClient.invalidateQueries({ queryKey: ["discount-table"] });
+      toast.success("Discount deleted successfully");
+    } catch (error) {
+      console.error(error);
+      toast(`Error in deleting discount: ${deleteDiscountError?.message}`);
+    }
+  };
+
+  const handleActiveStatus = async (
+    id: string,
+    status: boolean
+  ): Promise<void> => {
+    // Handle the active status toggle logic here
+    try {
+      await deactivateDiscountFn({
+        token: user?.token!,
+        id,
+        status,
+      });
+      queryClient.invalidateQueries({ queryKey: ["discount-table"] });
+      toast.success("Discount Updated successfully");
+    } catch (error) {
+      console.error(error);
+      toast(`Error in deleting discount: ${deactivateDiscountError?.message}`);
+    }
   };
 
   return (
@@ -138,6 +197,7 @@ export function DiscountsTable({ form }: DiscountsTableProps) {
                   <DropdownMenuItem
                     onClick={() => {
                       console.log("Toggle status", discount.id);
+                      handleActiveStatus(discount.id, !discount.active);
                     }}
                   >
                     <Power className="mr-2 h-4 w-4" />
@@ -147,15 +207,36 @@ export function DiscountsTable({ form }: DiscountsTableProps) {
                     <Pencil className="mr-2 h-4 w-4" />
                     <span>Edit</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={() => {
-                      console.log("Delete discount", discount.id);
-                    }}
-                  >
-                    <Trash className="mr-2 h-4 w-4" />
-                    <span>Delete</span>
-                  </DropdownMenuItem>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onSelect={(e) => e.preventDefault()}
+                      >
+                        <Trash className="mr-2 h-4 w-4" />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Discount</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete the discount code "
+                          {discount.code}"? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(discount.id)}
+                          className="bg-red-600 hover:bg-red-700"
+                          disabled={isDeletingDiscount}
+                        >
+                          {isDeletingDiscount ? "Deleting..." : "Delete"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>
@@ -168,4 +249,6 @@ export function DiscountsTable({ form }: DiscountsTableProps) {
 
 interface DiscountsTableProps {
   form: UseFormReturn<DiscountFormValues>;
+  setIsEditing: (value: boolean) => void;
+  setEditingId: (value: string) => void;
 }

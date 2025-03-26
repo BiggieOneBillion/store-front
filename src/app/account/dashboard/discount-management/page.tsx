@@ -23,6 +23,7 @@ import { useDiscount } from "@/hooks/useDiscount";
 import { useUserStore } from "@/store/user-store";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function DiscountManagementPage() {
   const form = useForm<DiscountFormValues>({
@@ -45,19 +46,38 @@ export default function DiscountManagementPage() {
     },
   });
 
-  const { createDiscountError, createDiscountFn, isCreatingDiscount } =
-    useDiscount();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string>("");
+
+  const {
+    createDiscountError,
+    createDiscountFn,
+    isCreatingDiscount,
+    updateDiscountError,
+    updateDiscountFn,
+  } = useDiscount();
   const { user } = useUserStore();
 
   const queryClient = useQueryClient();
 
   async function onSubmit(values: DiscountFormValues) {
-    console.log(values);
+    // console.log(values);
     try {
-      await createDiscountFn({
-        token: user?.token!,
-        data: values,
-      });
+      if (isEditing) {
+        const { code, ...others } = values;
+        await updateDiscountFn({
+          token: user?.token!,
+          id: editingId,
+          data: others,
+        });
+        setIsEditing(false);
+        setEditingId("");
+      } else {
+        await createDiscountFn({
+          token: user?.token!,
+          data: values,
+        });
+      }
 
       queryClient.invalidateQueries({ queryKey: ["discount-table"] });
 
@@ -131,7 +151,11 @@ export default function DiscountManagementPage() {
             <CardTitle>Active Discounts</CardTitle>
           </CardHeader>
           <CardContent>
-            <DiscountsTable form={form} />
+            <DiscountsTable
+              setIsEditing={setIsEditing}
+              setEditingId={setEditingId}
+              form={form}
+            />
           </CardContent>
         </Card>
       </section>

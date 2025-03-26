@@ -11,8 +11,12 @@ import { CreateProductForm } from "./create-product-form";
 import { Edit, PlusCircle } from "lucide-react";
 import { EditProductForm, ProductFormValues } from "./edit-product-form";
 
+type categoryId = {
+  categoryId: string;
+};
+
 type Props = {
-  data: Partial<ProductFormValues>;
+  data: Partial<ProductFormValues> & categoryId;
   productId: string
 };
 
