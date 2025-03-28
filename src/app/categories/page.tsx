@@ -33,11 +33,11 @@ const CategoriesPage = () => {
   console.log(categoriesData);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-xl text-gray-600 font-medium mb-8">
+    <div className="container mx-auto px-4 pb-8 md:py-8">
+      <h1 className="md:text-xl text-gray-600 font-medium mb-8">
         Shop by Category
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categoriesData &&
           Array.isArray(categoriesData.results) &&
           categoriesData?.results.map((category: Category) => (
@@ -66,7 +66,7 @@ const CategoriesPage = () => {
                       <h3 className="text-xl font-semibold mb-2 capitalize">
                         {category.name}
                       </h3>
-                      <p className="text-sm opacity-90 line-clamp-2">
+                      <p className="text-xs md:text-sm opacity-90 line-clamp-2 capitalize">
                         {category.description}
                       </p>
                     </div>

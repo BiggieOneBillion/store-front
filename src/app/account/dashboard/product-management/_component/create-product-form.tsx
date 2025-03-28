@@ -254,7 +254,7 @@ export function CreateProductForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-6 h-[80vh] px-2 overflow-y-scroll"
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[80vh] max-h-fit px-2 overflow-y-scroll"
       >
         <div className="space-y-6">
           {/* Basic Information section */}
@@ -476,9 +476,312 @@ export function CreateProductForm() {
               />
             </div>
           </div>
+
+          <section className="space-y-6 md:hidden">
+            {/* Images section */}
+            <div>
+              <h3 className="text-lg font-medium">Images</h3>
+              <div className="space-y-4 mt-4">
+                <FormField
+                  control={form.control}
+                  name="imageFiles"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Upload Images</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || []);
+                            const validFiles = files.filter(
+                              (file) => file.size <= 2 * 1024 * 1024
+                            );
+                            if (validFiles.length !== files.length) {
+                              alert(
+                                "Some files were not added because they exceed the 2MB size limit."
+                              );
+                            }
+                            field.onChange(validFiles);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Max file size: 2MB per image. You can select multiple
+                        files.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {form.watch("imageFiles").length > 0 && (
+                  <div className="grid grid-cols-3 gap-4">
+                    {form.watch("imageFiles").map((file, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={URL.createObjectURL(file) || "/placeholder.svg"}
+                          alt={`Uploaded image ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-md"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1"
+                          onClick={() => {
+                            const newFiles = [...form.getValues("imageFiles")];
+                            newFiles.splice(index, 1);
+                            form.setValue("imageFiles", newFiles);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Variants section */}
+            <div>
+              <h3 className="text-lg font-medium">Variants</h3>
+              <div className="space-y-4 mt-4">
+                {variants.map((variant, index) => (
+                  <Card key={index}>
+                    <CardContent className="flex justify-between items-center p-4">
+                      <div>
+                        <p className="font-medium">{variant.name}</p>
+                        <p className="text-sm text-gray-500">
+                          Price: ${variant.price} | Quantity: {variant.quantity}{" "}
+                          | SKU: {variant.sku}
+                        </p>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            editVariant(index);
+                          }}
+                          aria-label={`Edit ${variant.name}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <span
+                              className=" h-full flex items-center justify-center border py-[9px] px-2 rounded-sm shadow-sm"
+                              aria-label={`Delete ${variant.name}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </span>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete the variant.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteVariant(index)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
+                <Card>
+                  <CardContent className="p-4">
+                    <Form {...variantForm}>
+                      <div className="space-y-4">
+                        <FormField
+                          control={variantForm.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Variant Name</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Enter variant name"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={variantForm.control}
+                          name="price"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Price</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder="Enter price"
+                                  {...field}
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      Number.parseFloat(e.target.value)
+                                    )
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={variantForm.control}
+                          name="quantity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Quantity</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder="Enter quantity"
+                                  {...field}
+                                  onChange={(e) =>
+                                    field.onChange(
+                                      Number.parseInt(e.target.value)
+                                    )
+                                  }
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={variantForm.control}
+                          name="sku"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>SKU</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Enter SKU" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button
+                          type="button"
+                          onClick={variantForm.handleSubmit(onVariantSubmit)}
+                        >
+                          {editingVariantIndex !== null
+                            ? "Update Variant"
+                            : "Add Variant"}
+                        </Button>
+                      </div>
+                    </Form>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Specifications section */}
+            <div>
+              <h3 className="text-lg font-medium">Specifications</h3>
+              <div className="space-y-4 mt-4">
+                {specificationFields.map((field, index) => (
+                  <div key={field.id} className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name={`specifications.${index}.name`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{index === 0 ? "Name" : ""}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Specification name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`specifications.${index}.value`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{index === 0 ? "Value" : ""}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Specification value"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendSpecification({ name: "", value: "" })}
+                >
+                  Add Specification
+                </Button>
+              </div>
+            </div>
+
+            {/* Status section */}
+            <div>
+              <h3 className="text-lg font-medium">Status</h3>
+              <div className="space-y-4 mt-4">
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product Status</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="inactive">Inactive</SelectItem>
+                          <SelectItem value="out_of_stock">
+                            Out of Stock
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 hidden md:block">
           {/* Images section */}
           <div>
             <h3 className="text-lg font-medium">Images</h3>

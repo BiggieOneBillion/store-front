@@ -101,7 +101,7 @@ export function RecentOrders() {
           <CardTitle>Recent Orders</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
+          <Table className="text-nowrap">
             <TableHeader>
               <TableRow>
                 <TableHead>Order ID</TableHead>

@@ -72,7 +72,7 @@ export function OrderTableDisplay({ orders }: { orders: Order[] }) {
 
   return (
     <>
-      <Table>
+      <Table className="text-nowrap">
         <TableHeader>
           <TableRow>
             <TableHead>Order ID</TableHead>

@@ -3,13 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  CirclePercent,
+  CreditCard,
   Home,
+  Layers,
   LineChart,
   Package,
   Package2,
   PanelLeft,
   Settings,
+  ShoppingBag,
   ShoppingCart,
+  TableOfContents,
   Users2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,14 +40,29 @@ export function MobileNav() {
       label: "Products",
     },
     {
-      href: "/account/dashboard/customers",
+      href: "/account/dashboard/customers-management",
       icon: Users2,
       label: "Customers",
     },
     {
-      href: "/account/dashboard/analytics",
-      icon: LineChart,
-      label: "Settings",
+      href: "/account/dashboard/payment-management",
+      icon: CreditCard,
+      label: "Payments",
+    },
+    {
+      href: "/account/dashboard/discount-management",
+      icon: CirclePercent,
+      label: "Discount",
+    },
+    {
+      href: "/account/dashboard/category-management",
+      icon: TableOfContents,
+      label: "Category",
+    },
+    {
+      href: "/account/dashboard/stock-management",
+      icon: Layers,
+      label: "Stock report",
     },
   ];
 

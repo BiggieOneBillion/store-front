@@ -26,7 +26,7 @@ const CheckOutPageView = () => {
     setIsVerifying(true);
     try {
       const res = await verifyPayment(reference);
-      console.log("FROM CHECKOUT PAGE--------", res);
+      // console.log("FROM CHECKOUT PAGE--------", res);
 
       if (res.status === "success") {
         toast.success("Payment verified successfully");

@@ -30,13 +30,13 @@ export const addWishList = async (wishList: IWishList, token: string) => {
 };
 
 // for removing specific product from wishlist
-export const deleteUserWishList = async (params: {
+export const deleteUserWishListItem = async (params: {
   productId: string;
   // storeId: string;
   token: string;
 }) => {
   const response = await api.delete(
-    `${baseURL}/${params.productId}`,
+    `${baseURL}/${params.productId}/clear`,
     {
       headers: {
         Authorization: `Bearer ${params.token}`,

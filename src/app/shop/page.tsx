@@ -4,26 +4,32 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllStoreProducts } from "@/services/api/product";
 import { getCategories } from "@/services/api/categories";
 import { useUserStore } from "@/store/user-store";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Product } from "../account/dashboard/product-management/_component/columns";
+// import { Product } from "../account/dashboard/product-management/_component/columns";
+import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
+import { v4 } from "uuid";
+
+// Add these imports at the top
+import { SlidersHorizontal } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 const AllProductPage = () => {
   const { user } = useUserStore();
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedTag, setSelectedTag] = useState<string>("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([0, 30000]);
-  const [filterData, setFilterData] = useState<Product[] | null>(null);
 
   const { data: products, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["all-products"],
@@ -42,134 +48,197 @@ const AllProductPage = () => {
     () =>
       products?.filter((product) => {
         const matchesCategory =
-          selectedCategory === "" ||
-          selectedCategory === "all" ||
-          product.category.name.toLowerCase() ===
-            selectedCategory.toLowerCase();
+          selectedCategories.length === 0 ||
+          selectedCategories.includes("all") ||
+          selectedCategories.includes(product.category.name.toLowerCase());
 
         const matchesTag =
-          selectedTag === "" ||
-          selectedTag === "all" ||
-          product.tag.toLowerCase() === selectedTag.toLowerCase();
+          selectedTags.length === 0 ||
+          selectedTags.includes("all") ||
+          selectedTags.includes(product.tag.toLowerCase());
 
         const matchesPrice =
           product.price >= priceRange[0] && product.price <= priceRange[1];
 
         return matchesCategory && matchesTag && matchesPrice;
       }),
-    [products, selectedCategory, selectedTag, priceRange]
+    [products, selectedCategories, selectedTags, priceRange]
   );
 
-  // const handleSelectCategory = (value: string) => {
-  //   setSelectedCategory(value);
-  //   if (filterData && selectedCategory === "") {
-  //     setFilterData(
-  //       filterData.filter((product) => {
-  //         return product.category.name.toLowerCase() === value.toLowerCase();
-  //       })
-  //     );
-  //   } else {
-  //     const result = products!?.filter((product) => {
-  //       return product.category.name.toLowerCase() === value.toLowerCase();
-  //     });
-  //     setFilterData(result);
-  //   }
-  // };
+  // Checkbox handlers
+  const handleCategoryChange = (category: string, checked: boolean) => {
+    if (checked) {
+      setSelectedCategories([...selectedCategories, category.toLowerCase()]);
+    } else {
+      setSelectedCategories(
+        selectedCategories.filter((c) => c !== category.toLowerCase())
+      );
+    }
+  };
 
-  // const displayedProduct =
-  //   selectedCategory === "" &&
-  //   selectedTag == "" &&
-  //   priceRange[0] === 0 &&
-  //   priceRange[1] === 1000
-  //     ? products
-  //     : filteredProducts;
+  const handleTagChange = (tag: string, checked: boolean) => {
+    if (checked) {
+      setSelectedTags([...selectedTags, tag.toLowerCase()]);
+    } else {
+      setSelectedTags(selectedTags.filter((t) => t !== tag.toLowerCase()));
+    }
+  };
 
-  if (isLoadingProducts) return <div>Loading...</div>;
+  // Create a FilterContent component for reuse
+  const FilterContent = () => (
+    <div className="space-y-6">
+      {/* Categories Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium tracking-wide text-muted-foreground">
+          Categories
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant={selectedCategories.includes("all") ? "default" : "outline"}
+            size="sm"
+            onClick={() =>
+              handleCategoryChange("all", !selectedCategories.includes("all"))
+            }
+            className="h-8"
+          >
+            All
+          </Button>
+          {categories?.map((category: { name: string; id: string }) => (
+            <Button
+              key={category.id}
+              variant={
+                selectedCategories.includes(category.name.toLowerCase())
+                  ? "default"
+                  : "outline"
+              }
+              size="sm"
+              onClick={() =>
+                handleCategoryChange(
+                  category.name,
+                  !selectedCategories.includes(category.name.toLowerCase())
+                )
+              }
+              className="h-8"
+            >
+              {category.name}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Tags Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium tracking-wide text-muted-foreground">
+          Tags
+        </h3>
+        <div className="grid grid-cols-2 gap-2">
+          {["all", "latest", "featured", "sale", "regular"].map((tag) => (
+            <Button
+              key={tag}
+              variant={
+                selectedTags.includes(tag.toLowerCase()) ? "default" : "outline"
+              }
+              size="sm"
+              onClick={() =>
+                handleTagChange(tag, !selectedTags.includes(tag.toLowerCase()))
+              }
+              className="h-8 capitalize"
+            >
+              {tag}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Price Range Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium tracking-wide text-muted-foreground">
+          Price Range
+        </h3>
+        <Slider
+          defaultValue={[0, 30000]}
+          max={30000}
+          step={10}
+          onValueChange={setPriceRange}
+        />
+        <div className="flex justify-between text-sm">
+          <span>${priceRange[0]}</span>
+          <span>${priceRange[1]}</span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 pb-8 md:py-8">
+      <div className="text-gray-600 mb-5">
+        <h1 className="text-lg font-semibold">All Products</h1>
+        <p className="text-sm">See and filter our list of products</p>
+      </div>
+      {/* Mobile Filter Button */}
+      <div className="md:hidden mb-6">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm" className="w-full">
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[80vh]">
+            <SheetHeader>
+              <SheetTitle>Filters</SheetTitle>
+            </SheetHeader>
+            <FilterContent />
+          </SheetContent>
+        </Sheet>
+      </div>
+
       <div className="flex gap-8">
-        {/* Filters Column */}
-        <div className="min-w-[200px] w-[250px] rounded space-y-6 bg-gray-100/50 h-fit border p-2">
-         <div>
-          <h3 className="text-center bg-black text-white p-1 rounded">Filters</h3>
-         </div>
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Categories</h3>
-            <Select
-              onValueChange={setSelectedCategory}
-              value={selectedCategory}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories &&
-                  Array.isArray(categories) &&
-                  categories?.map((category) => (
-                    <SelectItem key={category.id} value={category.name}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Tags</h3>
-            <Select onValueChange={setSelectedTag} value={selectedTag}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select tag" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Tags</SelectItem>
-                <SelectItem value="latest">Latest</SelectItem>
-                <SelectItem value="featured">Featured</SelectItem>
-                <SelectItem value="sale">Sale</SelectItem>
-                <SelectItem value="regular">Regular</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="font-medium text-sm">Price Range</h3>
-            <Slider
-              defaultValue={[0, 30000]}
-              max={30000}
-              step={10}
-              onValueChange={setPriceRange}
-            />
-            <div className="flex justify-between text-sm">
-              <span>${priceRange[0]}</span>
-              <span>${priceRange[1]}</span>
-            </div>
-          </div>
+        {/* Desktop Filters Column */}
+        <div className="hidden md:block min-w-[200px] w-[250px] rounded space-y-6 bg-gray-100/50 h-fit border p-4">
+          <FilterContent />
         </div>
 
-        {/* Products Grid */}
+        {/* Products Grid section */}
         <div className="flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts?.length === 0 && (
+              <div className="col-span-3" key={v4()}>
+                <p className="text-2xl font-bold text-black/10">
+                  No products found.
+                </p>
+              </div>
+            )}
             {filteredProducts?.map((product) => (
-              <Card key={product.id} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="relative h-48 w-full">
-                    <Image
-                      src={product.images[0] || "/placeholder.png"}
-                      alt={product.name}
-                      fill
-                      className="object-cover"
-                    />
-                    <Badge className="absolute top-2 right-2">
-                      {product.tag}
-                    </Badge>
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <Badge variant="outline">{product.category.name}</Badge>
-                    <p className="font-semibold">${product.price}</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <Link
+                href={`/product/${product.id}/${product.name.replaceAll(
+                  " ",
+                  "-"
+                )}`}
+                key={v4()}
+              >
+                <Card key={product.id} className="overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="relative h-48 w-full">
+                      <Image
+                        src={product.images[0] || "/placeholder.png"}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                      />
+                      <Badge className="absolute top-2 right-2">
+                        {product.tag}
+                      </Badge>
+                    </div>
+                    <div className="p-4 space-y-2">
+                      <Badge variant="outline" className="text-gray-500">
+                        {product.category.name}
+                      </Badge>
+                      <p className="font-semibold">${product.price}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>

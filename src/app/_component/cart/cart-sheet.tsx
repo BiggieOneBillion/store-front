@@ -18,7 +18,6 @@ import { toast } from "sonner";
 
 const CartSheet = () => {
   const { cart } = useCartStore();
-  console.log("CART", cart);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const { hasHydrated, user } = useUserStore();

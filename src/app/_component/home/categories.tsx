@@ -96,8 +96,8 @@ const Categories = () => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-[-50px]" />
-          <CarouselNext className="right-[-50px]" />
+          <CarouselPrevious className="left-[5%] lg:left-[-50px]" />
+          <CarouselNext className="right-[5%] lg:right-[-50px]" />
         </Carousel>
       </div>
     </div>

@@ -15,7 +15,7 @@ const StoreDetails = () => {
         <CustomersCard />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 overflow-auto">
         <RecentOrders />
         <RecentProducts />
       </div>

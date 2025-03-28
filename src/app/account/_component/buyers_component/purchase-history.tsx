@@ -29,6 +29,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { initiatePayment } from "@/services/api/paystack";
+import { useToast } from "@/hooks/use-toast";
+import { set } from "date-fns";
+import { CheckCircle2, XCircle, Clock } from "lucide-react";
 
 interface OrderItem {
   _id: string;
@@ -62,14 +66,16 @@ export default function PurchaseHistory() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [visibleIds, setVisibleIds] = useState<Record<string, boolean>>({});
   const { user } = useUserStore();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { data: orders = [], isLoading } = useQuery<Order[]>({
+  const { data: orders = [], isLoading: isloadingOrders } = useQuery<Order[]>({
     queryKey: ["users-order"],
     queryFn: async () =>
       await getUsersOrder({ token: user?.token!, userId: user?.id! }),
   });
 
-  if (isLoading) {
+  if (isloadingOrders) {
     return <p>..Loading!</p>;
   }
 
@@ -93,6 +99,27 @@ export default function PurchaseHistory() {
     return isVisible ? id : `****${id.slice(-4)}`;
   };
 
+  const handlePayment = async (orderId: string) => {
+    setIsLoading(true);
+    try {
+      const response = await initiatePayment(orderId, user?.token!);
+      console.log(response);
+      // Paystack returns authorization URL
+      if (response.status && response.data.authorization_url) {
+        window.location.href = response.data.authorization_url;
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Payment Error",
+        description: "Failed to initiate payment. Please try again.",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  // console.log("COUNT-DOWN", filteredOrders[1].status);
+
   return (
     <section className="bg-white px-5 py-5 rounded-md border mt-10">
       <div className="space-y-4">
@@ -105,7 +132,7 @@ export default function PurchaseHistory() {
               className="max-w-sm"
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          {/* <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
@@ -116,7 +143,7 @@ export default function PurchaseHistory() {
               <SelectItem value="delivered">Delivered</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
         </div>
 
         <Table>
@@ -207,17 +234,59 @@ export default function PurchaseHistory() {
                         ? "bg-green-500"
                         : order.status === "cancelled"
                         ? "bg-red-500"
+                        : order.status === "awaiting_payment"
+                        ? "bg-orange-500"
                         : "bg-yellow-500"
                     }`}
                   >
                     {order.status.charAt(0).toUpperCase() +
                       order.status.slice(1)}
                   </Badge>
+                  {order.status === "awaiting_payment" && (
+                    <Button
+                      onClick={() => handlePayment(order.id)}
+                      size="sm"
+                      className="ml-2"
+                    >
+                      {isLoading ? "Paying..." : "Pay Now"}
+                    </Button>
+                  )}
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="capitalize">
-                    {order.payment.gateway}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <span
+                      // variant="outline"
+                      className={`capitalize flex items-center gap-1.5 ${
+                        order.payment.status === "success"
+                          ? "text-green-500 border-green-500"
+                          : order.payment.status === "failed"
+                          ? "text-red-500 border-red-500"
+                          : "text-orange-500 border-orange-500"
+                      }`}
+                    >
+                      {order.payment.status === "success" && (
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                      )}
+                      {order.payment.status === "failed" && (
+                        <XCircle className="h-3.5 w-3.5" />
+                      )}
+                      {order.payment.status === "pending" && (
+                        <Clock className="h-3.5 w-3.5" />
+                      )}
+                      {order.payment.status}
+                    </span>
+                    {order.status === "awaiting_payment" && (
+                      <Button
+                        onClick={() => handlePayment(order.id)}
+                        size="sm"
+                        variant="outline"
+                        className="ml-2"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Processing..." : "Pay Now"}
+                      </Button>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

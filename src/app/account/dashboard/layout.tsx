@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     <section className="space-y-10">
       <TooltipProvider>
         <DashboardNewLayout>
-          <main className="px-10 py-10 bg-gray-100 min-h-screen">   
+          <main className="px-2 md:px-10 py-2 md:py-10 bg-gray-100 min-h-screen">   
             {children}
           </main>
         </DashboardNewLayout>

@@ -32,7 +32,6 @@ export default function CustomersPage() {
     );
   }
 
-  console.log(customers)
 
   if (!customers) {
     return <div>No customers found</div>;

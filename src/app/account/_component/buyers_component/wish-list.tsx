@@ -57,8 +57,8 @@ const WishList = () => {
     return <p>Error while fetching wish list</p>;
   }
 
-  if (!data) {
-    return <p>No data</p>;
+  if (!data || data.products.length === 0) {
+    return <p className="mt-5 text-2xl font-semibold text-black/10">No Product In Wish List</p>;
   }
 
   return (

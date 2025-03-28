@@ -33,10 +33,9 @@ export default function ProductsTableView() {
     queryFn: async () => await getStoreProducts(user?.id!, user?.token!),
   });
 
-  // console.log(data)
 
   return (
-    <Card>
+    <Card className="w-full overflow-auto">
       <CardHeader>
         <section className="flex items-center justify-between">
           <section>
@@ -47,7 +46,7 @@ export default function ProductsTableView() {
             <div className="ml-auto flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8 gap-1">
+                  <Button variant="outline" size="sm" className="h-8 gap-1 hidden">
                     <ListFilter className="h-3.5 w-3.5" />
                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                       Filter
@@ -64,7 +63,7 @@ export default function ProductsTableView() {
                   <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button size="sm" variant="outline" className="h-8 gap-1">
+              <Button size="sm" variant="outline" className="h-8 gap-1 hidden">
                 <File className="h-3.5 w-3.5" />
                 <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                   Export

@@ -6,13 +6,14 @@ import PaymentSettings from "./_component/payment-settings";
 
 export default function PaymentPage() {
   return (
-    <div className=" py-6">
-      <Tabs
+    <div className="py-6">
+      <PaymentHistory />
+      {/* <Tabs
         defaultValue="payment-history"
         className="w-full"
         orientation="horizontal"
       >
-        <TabsList className="grid w-full grid-cols-4 mb-8">
+        <TabsList className="grid w-full lg:grid-cols-4 mb-8">
           <TabsTrigger value="payment-history">Payment History</TabsTrigger>
           <TabsTrigger value="payment-settings">Payment Settings</TabsTrigger>
         </TabsList>
@@ -22,7 +23,7 @@ export default function PaymentPage() {
         <TabsContent value="payment-settings">
           <PaymentSettings />
         </TabsContent>
-      </Tabs>
+      </Tabs> */}
     </div>
   );
 }

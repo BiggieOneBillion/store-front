@@ -8,7 +8,7 @@ import StoreSettingsView from "./store-settings/_component/store-settings-view";
 
 const AdminDashboard = () => {
   return (
-    <div className=" space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="text-xl font-medium tracking-tight">Store Dashboard</h1>
         <p className="text-muted-foreground text-sm">
@@ -24,16 +24,16 @@ const AdminDashboard = () => {
           <Tabs defaultValue="details" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="details">Store Details</TabsTrigger>
-              <TabsTrigger value="settings">Store Settings</TabsTrigger>
+              {/* <TabsTrigger value="settings">Store Settings</TabsTrigger> */}
             </TabsList>
 
             <TabsContent value="details">
               <StoreDetails />
             </TabsContent>
 
-            <TabsContent value="settings">
+            {/* <TabsContent value="settings">
               <StoreSettingsView />
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
         </CardContent>
       </Card>

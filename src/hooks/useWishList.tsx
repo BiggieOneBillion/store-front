@@ -1,7 +1,7 @@
 import {
   addWishList,
   clearUserWishList,
-  deleteUserWishList,
+  deleteUserWishListItem,
   IWishList,
 } from "@/services/api/wishlist";
 import { useMutation } from "@tanstack/react-query";
@@ -25,7 +25,7 @@ export const useWishList = () => {
       productId: string;
       // storeId: string;
       token: string;
-    }) => deleteUserWishList(params),
+    }) => deleteUserWishListItem(params),
   });
 
   const {

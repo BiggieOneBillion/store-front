@@ -19,6 +19,7 @@ const WhichLayout = ({ children }: { children: ReactNode }) => {
     "/account/dashboard/customers-management",
     "/account/dashboard/discount-management",
     "/account/dashboard/category-management",
+    "/account/dashboard/stock-management",
   ];
 
   return path.includes(pathName) ? (

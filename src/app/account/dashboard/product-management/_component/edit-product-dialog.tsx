@@ -26,6 +26,7 @@ export function EditProductDialog({ data, productId }: Props) {
       <DialogTrigger asChild>
         <span className="h-8 gap-1 flex items-center text-sm pl-2 w-full cursor-pointer hover:bg-zinc-100 rounded-sm">
           <Edit className="h-3.5 w-3.5 sm:hidden" />
+          <span className="sm:hidden">Edit</span>
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             Edit Product
           </span>

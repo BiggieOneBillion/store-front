@@ -30,7 +30,13 @@ import {
   Phone,
   Download,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 // import { customersData } from "../_data/customers-data";
 
 export interface ICustomer {
@@ -92,9 +98,13 @@ export default function CustomersTable({ customersData }: Props) {
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Customers</CardTitle>
-        <div className="flex items-center gap-4">
+      <CardHeader className="flex flex-col items-start gap-5 md:gap-0 md:flex-row md:items-center justify-between">
+        {/* <CardTitle>Customers</CardTitle> */}
+        <section>
+          <CardTitle>Customers</CardTitle>
+          <CardDescription>This is a list of your customers and their information</CardDescription>
+        </section>
+        <div className="flex flex-col items-start md:flex-row  md:items-center gap-4">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -108,7 +118,7 @@ export default function CustomersTable({ customersData }: Props) {
             <UserPlus className="mr-2 h-4 w-4" />
             Add Customer
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" className="hidden">
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
@@ -116,7 +126,7 @@ export default function CustomersTable({ customersData }: Props) {
       </CardHeader>
       <CardContent>
         <div className="rounded-md border">
-          <Table>
+          <Table className="text-nowrap">
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>

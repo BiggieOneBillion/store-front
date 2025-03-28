@@ -45,6 +45,7 @@ export function DeleteProductAlert({ productId }: Props) {
       <AlertDialogTrigger asChild>
       <span className="h-8 gap-1 flex items-center text-sm pl-2 w-full cursor-pointer hover:bg-zinc-100 rounded-sm">
           <Trash2 className="h-3.5 w-3.5 sm:hidden" />
+          <span className="sm:hidden">Delete</span>
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             Delete Product
           </span>

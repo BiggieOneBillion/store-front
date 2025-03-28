@@ -5,7 +5,7 @@ import { SidebarNav } from "./_new-dashboard-components/sidebar-nav";
 
 const NewDashboardLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <main className="pl-10">
+    <main className="md:pl-10">
       <header>
         <section className="pt-5">
           <Header />

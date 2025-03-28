@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EditProductDialog } from "./edit-product-dialog";
 import { DeleteProductAlert } from "./delete-product-alert";
+import { DiscountDetailsDialog } from "./discount-details-dialog";
 
 // This type defines the shape of our data based on the provided schema.
 export type Product = {
@@ -161,9 +162,7 @@ export const columns: ColumnDef<Product>[] = [
     },
     cell: ({ row }) => {
       const quantity = row.original.inventory.quantity;
-      console.log(row.original);
-
-      return <div className="text-left w-fit">{quantity}</div>;
+      return <div className="text-left pl-6">{quantity}</div>;
     },
   },
   {
@@ -202,6 +201,30 @@ export const columns: ColumnDef<Product>[] = [
   //     },
   //   },
   {
+    accessorKey: "discount",
+    header: "Discount",
+    cell: ({ row }) => {
+      const discount = row.original.discount;
+      
+      if (!discount?.active) {
+        return <Badge variant="outline">No Discount</Badge>;
+      }
+
+      return (
+        <DiscountDetailsDialog discount={discount}>
+          <Badge 
+            variant="secondary" 
+            className="cursor-pointer hover:bg-secondary/80"
+          >
+            {discount.type === 'percentage' 
+              ? `${discount.value}% Off` 
+              : `$${discount.value} Off`}
+          </Badge>
+        </DiscountDetailsDialog>
+      );
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const product = row.original;
@@ -215,13 +238,13 @@ export const columns: ColumnDef<Product>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
+            {/* <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(product.id)}
             >
               Copy product ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem>View details</DropdownMenuItem> */}
             {/* <DropdownMenuItem> */}
             {/* Edit */}
             <EditProductDialog
@@ -253,4 +276,5 @@ export const columns: ColumnDef<Product>[] = [
       );
     },
   },
+
 ];

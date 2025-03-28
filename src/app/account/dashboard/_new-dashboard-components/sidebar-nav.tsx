@@ -6,6 +6,7 @@ import {
   CirclePercent,
   CreditCard,
   Home,
+  Layers,
   LineChart,
   Package,
   Package2,
@@ -52,13 +53,18 @@ export function SidebarNav() {
     },
     {
       href: "/account/dashboard/discount-management",
-      icon:  CirclePercent,
+      icon: CirclePercent,
       label: "Discount",
     },
     {
       href: "/account/dashboard/category-management",
-      icon:  TableOfContents,
+      icon: TableOfContents,
       label: "Category",
+    },
+    {
+      href: "/account/dashboard/stock-management",
+      icon: Layers,
+      label: "Stock report",
     },
   ];
 
