@@ -145,7 +145,7 @@ export function DiscountsTable({ form, setEditingId, setIsEditing }: DiscountsTa
   };
 
   return (
-    <Table>
+    <Table className="text-nowrap">
       <TableHeader>
         <TableRow>
           <TableHead>Code</TableHead>
