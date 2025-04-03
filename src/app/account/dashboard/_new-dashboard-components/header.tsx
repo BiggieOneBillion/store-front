@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { Search, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { MobileNav } from "./mobile-nav";
+import Link from "next/link";
 
 export function Header() {
   return (
@@ -25,7 +26,7 @@ export function Header() {
         </p>
       </div>
       
-      <div className="relative ml-auto flex-1 md:grow-0">
+      <div className="relative ml-auto flex-1 md:grow-0 hidden">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
@@ -33,8 +34,18 @@ export function Header() {
           className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
         />
       </div>
+
+      {/* mobile view */}
+      <div className="flex items-center mx-autoy md:hidden">
+      <Link href={"/"}>
+          <h1 className="font-medium text-sm text-black/90 uppercase flex items-center gap-1">
+            <Store size={16} />
+            <span className="font-semibold">Multistore Store</span>
+          </h1>
+        </Link> 
+      </div>
       
-      <DropdownMenu>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
@@ -58,7 +69,7 @@ export function Header() {
           <DropdownMenuSeparator />
           <DropdownMenuItem>Logout</DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
     </header>
   );
 }

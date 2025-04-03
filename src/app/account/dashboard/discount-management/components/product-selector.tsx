@@ -106,7 +106,7 @@ export function ProductSelector({ form }: ProductSelectorProps) {
                         <div className="flex flex-col">
                           <span className="font-medium">{product.name}</span>
                           <span className="text-sm text-muted-foreground">
-                            ${product.price} - {product.category}
+                            ${product.price} - {product.category.name}
                           </span>
                         </div>
                       </div>
@@ -181,7 +181,7 @@ export function ProductSelector({ form }: ProductSelectorProps) {
                         <div className="flex flex-col">
                           <span className="font-medium">{product.name}</span>
                           <span className="text-sm text-muted-foreground">
-                            ${product.price} - {product.category}
+                            ${product.price} - {product.category.name}
                           </span>
                         </div>
                       </div>

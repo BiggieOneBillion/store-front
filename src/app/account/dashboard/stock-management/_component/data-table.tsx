@@ -70,18 +70,18 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex flex-col gap-3 md:gap-0 items-start md:flex-row md:items-center py-4">
         <Input
           placeholder="Filter by product name..."
           value={(table.getColumn("product.name")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("product.name")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
+          className="max-w-sm text-sm"
         />
         <Select
           value={(table.getColumn("type")?.getFilterValue() as string) ?? "all"}
           onValueChange={(value) => table.getColumn("type")?.setFilterValue(value === "all" ? "" : value)}
         >
-          <SelectTrigger className="w-[180px] ml-4">
+          <SelectTrigger className="w-[180px] hidden md:inline ml-4">
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
@@ -94,7 +94,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         </Select>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="md:ml-auto">
               Columns
             </Button>
           </DropdownMenuTrigger>
@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         </DropdownMenu>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="ml-4">
+            <Button variant="outline" size="sm" className="md:ml-4">
               <PlusCircle className="h-4 w-4 mr-2" />
               Add Stock
             </Button>
@@ -132,7 +132,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         </Dialog>
       </div>
       <div className="rounded-md border">
-        <Table>
+        <Table className="text-nowrap">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

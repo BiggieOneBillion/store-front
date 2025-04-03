@@ -77,11 +77,11 @@ export function MobileNav() {
       <SheetContent side="left" className="sm:max-w-xs">
         <nav className="grid gap-6 text-lg font-medium">
           <Link
-            href="#"
-            className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+            href="/"
+            className="group border-b rounded-none flex h-10 w-10y shrink-0 items-center justify-centery gap-2 rounded-fully bg-primaryy text-lg font-semibold text-primary-foregroundy text-black md:text-base"
           >
-            <Package2 className="h-5 w-5 transition-all group-hover:scale-110" />
-            <span className="sr-only">Acme Inc</span>
+            <Package2 className="h-4 w-4 transition-all group-hover:scale-110" />
+            <span className="font-medium text-sm">Multistore</span>
           </Link>
           
           {navItems.map((item) => {

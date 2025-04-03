@@ -14,7 +14,7 @@ const HomeView = () => {
       <LatestProducts />
       <div className="flex items-center justify-center">
         <Button>
-          <Link href="/products">View All Products</Link>
+          <Link href="/shop">View All Products</Link>
         </Button>
       </div>
     </section>

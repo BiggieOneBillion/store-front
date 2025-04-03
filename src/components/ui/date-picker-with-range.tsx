@@ -1,20 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { addDays, format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { DateRange } from "react-day-picker"
+import * as React from "react";
+import { addDays, format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./popover"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
-interface DatePickerWithRangeProps extends React.HTMLAttributes<HTMLDivElement> {
+interface DatePickerWithRangeProps {
+  className?: string;
   selected?: DateRange;
   onSelect?: (date: DateRange | undefined) => void;
 }
@@ -24,10 +21,12 @@ export function DatePickerWithRange({
   selected,
   onSelect,
 }: DatePickerWithRangeProps) {
-  const [date, setDate] = React.useState<DateRange | undefined>(selected || {
-    from: new Date(),
-    to: addDays(new Date(), 30),
-  })
+  const [date, setDate] = React.useState<DateRange | undefined>(
+    selected || {
+      from: new Date(),
+      to: addDays(new Date(), 30),
+    }
+  );
 
   React.useEffect(() => {
     if (selected) {
@@ -79,5 +78,5 @@ export function DatePickerWithRange({
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }

@@ -76,6 +76,16 @@ interface Category {
 
 export type CategoryFormValues = z.infer<typeof categorySchema>;
 
+// Add imports
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { PlusCircle } from "lucide-react";
+
 export default function CategoryManagement() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -109,10 +119,19 @@ export default function CategoryManagement() {
     },
   });
 
-  console.log("CATEGORY DATA", categories);
+  // console.log("CATEGORY DATA", categories);
 
+  const [open, setOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string>("");
+
+  // Modify handleEdit function
   const handleEdit = (category: CategoryFormValues) => {
     form.reset(category);
+    setIsEditing(true);
+    if (window.innerWidth < 768) {
+      setOpen(true);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -168,226 +187,375 @@ export default function CategoryManagement() {
     }
   }
 
+  // Create CategoryForm component
+  const CategoryForm = () => (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Category name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="imageFile"
+          render={({ field: { onChange, ...field } }) => (
+            <FormItem>
+              <FormLabel>Category Image</FormLabel>
+              <FormControl>
+                <div className="space-y-4">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="cursor-pointer"
+                  />
+                  {imagePreview && (
+                    <div className="relative w-full h-48 rounded-lg overflow-hidden">
+                      <Image
+                        src={imagePreview}
+                        alt="Category preview"
+                        width={150}
+                        height={150}
+                        className="object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={() => {
+                          setImagePreview(null);
+                          setSelectedFile(null);
+                          form.setValue("imageFile", undefined);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </FormControl>
+              <FormDescription>
+                Upload an image for the category (recommended size: 800x600)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Slug</FormLabel>
+              <FormControl>
+                <Input placeholder="category-slug" {...field} />
+              </FormControl>
+              <FormDescription>
+                URL-friendly version of the category name
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Category description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="featured"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Featured Category</FormLabel>
+                <FormDescription>
+                  Display this category in featured sections
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="order"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Display Order</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(Number(e.target.value))}
+                />
+              </FormControl>
+              <FormDescription>
+                Order in which category appears (optional)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="metaTitle"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Meta Title</FormLabel>
+              <FormControl>
+                <Input placeholder="SEO meta title" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="metaDescription"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Meta Description</FormLabel>
+              <FormControl>
+                <Textarea placeholder="SEO meta description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" disabled={isCreatingCategory}>
+          {isCreatingCategory
+            ? "Creating..."
+            : isEditing
+            ? "Update Category"
+            : "Create Category"}
+        </Button>
+      </form>
+    </Form>
+  );
+
   return (
-    <div className="container mx-autoy pb-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Form Column */}
+    <div className="container mx-auto pb-10">
+      {/* Mobile View */}
+      <div className="md:hidden">
+        <div className="flex flex-col items-start gap-5 md:gap-0 md:flex-row  justify-between md:items-center mb-4">
+          <section>
+            <h2 className="text-lg font-medium">Categories</h2>
+            <p className="text-sm text-gray-500">
+              Manage your product category.
+            </p>
+          </section>
+          <Dialog
+            open={open}
+            onOpenChange={(value) => {
+              setOpen(value);
+              if (!value) {
+                setIsEditing(false);
+                setEditingId("");
+                form.reset({
+                  status: "active",
+                  featured: false,
+                });
+                setImagePreview(null);
+                setSelectedFile(null);
+              }
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <PlusCircle className="h-4 w-4" />
+                Add Category
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[90vw] h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {isEditing ? "Edit Category" : "Create Category"}
+                </DialogTitle>
+              </DialogHeader>
+              <CategoryForm />
+            </DialogContent>
+          </Dialog>
+        </div>
+        <Card>
+          <CardContent>
+            <Table className="text-nowrap">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Featured</TableHead>
+                  <TableHead>Order</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">
+                      Loading...
+                    </TableCell>
+                  </TableRow>
+                ) : categories.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">
+                      No categories found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  categories &&
+                  Array.isArray(categories) &&
+                  categories?.map((category) => (
+                    <TableRow key={category.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{category.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {category.slug}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={
+                            category.status === "active"
+                              ? "bg-green-500 text-white"
+                              : "bg-gray-500 text-white"
+                          }
+                        >
+                          {category.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {category.featured ? "Featured" : "Not Featured"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{category.order || "-"}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleEdit({
+                                  name: category.name,
+                                  status: category.status,
+                                  slug: category.slug,
+                                  featured: category.featured,
+                                  order: category.order,
+                                  description: category.description,
+                                  parent: category.parent || undefined,
+                                  metaTitle: category.metaTitle,
+                                  metaDescription: category.metaDescription,
+                                })
+                              }
+                            >
+                              <Pencil className="mr-2 h-4 w-4" />
+                              <span>Edit</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleStatusToggle(category.id, category.status)
+                              }
+                            >
+                              <Power className="mr-2 h-4 w-4" />
+                              <span>
+                                {category.status === "active"
+                                  ? "Deactivate"
+                                  : "Activate"}
+                              </span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => handleDelete(category.id)}
+                            >
+                              <Trash className="mr-2 h-4 w-4" />
+                              <span>Delete</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden md:grid grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Create Category</CardTitle>
+            <CardTitle>
+              {isEditing ? "Edit Category" : "Create Category"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Category name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="imageFile"
-                  render={({ field: { onChange, ...field } }) => (
-                    <FormItem>
-                      <FormLabel>Category Image</FormLabel>
-                      <FormControl>
-                        <div className="space-y-4">
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="cursor-pointer"
-                          />
-                          {imagePreview && (
-                            <div className="relative w-full h-48 rounded-lg overflow-hidden">
-                              <Image
-                                src={imagePreview}
-                                alt="Category preview"
-                                width={150}
-                                height={150}
-                                className="object-cover"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="sm"
-                                className="absolute top-2 right-2"
-                                onClick={() => {
-                                  setImagePreview(null);
-                                  setSelectedFile(null);
-                                  form.setValue("imageFile", undefined);
-                                }}
-                              >
-                                Remove
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        Upload an image for the category (recommended size:
-                        800x600)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Slug</FormLabel>
-                      <FormControl>
-                        <Input placeholder="category-slug" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        URL-friendly version of the category name
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Category description"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="featured"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                          Featured Category
-                        </FormLabel>
-                        <FormDescription>
-                          Display this category in featured sections
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="order"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Display Order</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Order in which category appears (optional)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="metaTitle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Meta Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="SEO meta title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="metaDescription"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Meta Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="SEO meta description"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit">Create Category</Button>
-              </form>
-            </Form>
+            <CategoryForm />
           </CardContent>
         </Card>
 
-        {/* Table Column */}
         <Card>
           <CardHeader>
             <CardTitle>Categories</CardTitle>
@@ -456,17 +624,19 @@ export default function CategoryManagement() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                              onClick={() => handleEdit({
-                                name: category.name,
-                                status: category.status,
-                                slug: category.slug,
-                                featured: category.featured,
-                                order: category.order,
-                                description: category.description,
-                                parent: category.parent || undefined,
-                                metaTitle: category.metaTitle,
-                                metaDescription: category.metaDescription
-                              })}
+                              onClick={() =>
+                                handleEdit({
+                                  name: category.name,
+                                  status: category.status,
+                                  slug: category.slug,
+                                  featured: category.featured,
+                                  order: category.order,
+                                  description: category.description,
+                                  parent: category.parent || undefined,
+                                  metaTitle: category.metaTitle,
+                                  metaDescription: category.metaDescription,
+                                })
+                              }
                             >
                               <Pencil className="mr-2 h-4 w-4" />
                               <span>Edit</span>

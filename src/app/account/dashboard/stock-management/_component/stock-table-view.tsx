@@ -24,10 +24,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useUserStore } from "@/store/user-store";
 import { getStockHistory } from "@/services/api/inventory";
 
-// Replace with your actual API function
-// const getStockHistory = async (userId: string, token: string) => {
-//   // Implementation here
-// };
 
 const dummyStockHistory = {
   results: [
@@ -114,7 +110,7 @@ export default function StockTableView() {
   const { data, isLoading } = useQuery({
     queryKey: ["stock-history"],
     queryFn: async () => await getStockHistory(user?.token!),
-    initialData: dummyStockHistory,
+    initialData: [],
   });
 
  
@@ -128,7 +124,7 @@ export default function StockTableView() {
             <CardDescription>Track your inventory changes</CardDescription>
           </section>
           <div className="flex items-center">
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto hidden flexy items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="h-8 gap-1">

@@ -1,4 +1,3 @@
-
 import { Product } from "@/app/account/dashboard/product-management/_component/columns";
 import api from "@/lib/api";
 
@@ -36,6 +35,23 @@ export const getProductDetails = async (id: string, token: string) => {
       "Content-Type": "application/json",
     },
   });
+  return response.data;
+};
+
+export const getRelatedProduct = async (params: {
+  productId: string;
+  token: string;
+  categoryId: string;
+}) => {
+  const response = await api.get(
+    `${baseURL}/related/${params.productId}/${params.categoryId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${params.token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
   return response.data;
 };
 

@@ -73,7 +73,7 @@ export function CategorySelector({ form }: CategorySelectorProps) {
   const categories = Array.from(new Set(products.map(product => product.category)));
   
   const filteredCategories = categories.filter(category =>
-    category.toLowerCase().includes(searchQuery.toLowerCase())
+    category.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -114,12 +114,12 @@ export function CategorySelector({ form }: CategorySelectorProps) {
                 <div className="max-h-[300px] overflow-y-auto space-y-2">
                   {filteredCategories.map((category) => (
                     <div
-                      key={category}
+                      key={category.name}
                       className="flex items-center space-x-2 p-2 hover:bg-accent rounded-md cursor-pointer"
                       onClick={() => {
                         const current = field.value || [];
-                        const updated = current.includes(category)
-                          ? current.filter((c) => c !== category)
+                        const updated = current.includes(category.name)
+                          ? current.filter((c) => c !== category.name)
                           : [...current, category];
                         field.onChange(updated);
                       }}
@@ -127,12 +127,12 @@ export function CategorySelector({ form }: CategorySelectorProps) {
                       <Check
                         className={cn(
                           "h-4 w-4",
-                          field.value?.includes(category)
+                          field.value?.includes(category.name)
                             ? "opacity-100"
                             : "opacity-0"
                         )}
                       />
-                      <span>{category}</span>
+                      <span>{category.name}</span>
                     </div>
                   ))}
                 </div>

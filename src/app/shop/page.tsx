@@ -42,6 +42,7 @@ const AllProductPage = () => {
       const res = await getCategories({ token: user?.token! });
       return res.results;
     },
+    initialData: [],
   });
 
   const filteredProducts = useMemo(
@@ -103,26 +104,28 @@ const AllProductPage = () => {
           >
             All
           </Button>
-          {categories?.map((category: { name: string; id: string }) => (
-            <Button
-              key={category.id}
-              variant={
-                selectedCategories.includes(category.name.toLowerCase())
-                  ? "default"
-                  : "outline"
-              }
-              size="sm"
-              onClick={() =>
-                handleCategoryChange(
-                  category.name,
-                  !selectedCategories.includes(category.name.toLowerCase())
-                )
-              }
-              className="h-8"
-            >
-              {category.name}
-            </Button>
-          ))}
+          {categories &&
+            Array.isArray(categories) &&
+            categories?.map((category: { name: string; id: string }) => (
+              <Button
+                key={category.id}
+                variant={
+                  selectedCategories.includes(category.name.toLowerCase())
+                    ? "default"
+                    : "outline"
+                }
+                size="sm"
+                onClick={() =>
+                  handleCategoryChange(
+                    category.name,
+                    !selectedCategories.includes(category.name.toLowerCase())
+                  )
+                }
+                className="h-8"
+              >
+                {category.name}
+              </Button>
+            ))}
         </div>
       </div>
 
@@ -209,37 +212,58 @@ const AllProductPage = () => {
                 </p>
               </div>
             )}
-            {filteredProducts?.map((product) => (
-              <Link
-                href={`/product/${product.id}/${product.name.replaceAll(
-                  " ",
-                  "-"
-                )}`}
-                key={v4()}
-              >
-                <Card key={product.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="relative h-48 w-full">
-                      <Image
-                        src={product.images[0] || "/placeholder.png"}
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                      />
-                      <Badge className="absolute top-2 right-2">
-                        {product.tag}
-                      </Badge>
-                    </div>
-                    <div className="p-4 space-y-2">
-                      <Badge variant="outline" className="text-gray-500">
-                        {product.category.name}
-                      </Badge>
-                      <p className="font-semibold">${product.price}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+            {filteredProducts?.map((product) => {
+              const discountedPrice = product.discount?.active && product.discount?.value! > 0
+                ? product.discount.type === "percentage"
+                  ? product.price - (product.price * (product.discount?.value! / 100))
+                  : product.price - product.discount?.value!
+                : product.price;
+
+              return (
+                <Link
+                  href={`/product/${product.category.name}-${
+                    product.id
+                  }/${product.name.replaceAll(" ", "-")}-${product.category.id}`}
+                  key={v4()}
+                >
+                  <Card key={product.id} className="overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="relative h-48 w-full">
+                        <Image
+                          src={product.images[0] || "/placeholder.png"}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                        />
+                        <Badge className="absolute top-2 right-2">
+                          {product.tag}
+                        </Badge>
+                        {product.discount?.active && (
+                          <Badge variant="destructive" className="absolute top-2 left-2">
+                            {product.discount.type === "percentage"
+                              ? `-${product.discount.value}%`
+                              : `-$${product.discount.value}`}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="p-4 space-y-2">
+                        <Badge variant="outline" className="text-gray-500">
+                          {product.category.name}
+                        </Badge>
+                        <div className="flex flex-col">
+                          <span className="font-semibold">${discountedPrice.toFixed(2)}</span>
+                          {product.discount?.active && (
+                            <span className="text-sm text-red-500 line-through">
+                              ${product.price.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>

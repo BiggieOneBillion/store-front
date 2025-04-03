@@ -73,7 +73,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <CardContent className="p-4">
         <Link
-          href={`/product/${product.id}/${product.name.replaceAll(" ", "-")}`}
+          href={`/product/${product.category.name}-${product.id}/${product.name.replaceAll(" ", "-")}-${product.category.id}`}
         >
           {/* Category & Status */}
           <div className="flex items-center gap-2 mb-2">

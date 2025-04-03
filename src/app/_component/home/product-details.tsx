@@ -6,6 +6,11 @@ import { useCartStore } from "@/store/cart-store";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import SaveToWishlist from "./save-to-wishlist";
+import { useParams } from "next/navigation";
+// Add these imports
+import { getRelatedProduct } from "@/services/api/product";
+import { ProductCard } from "./product-card";
+import RelatedProducts from "./related-products";
 
 type Props = {
   id: string;
@@ -14,9 +19,13 @@ type Props = {
 const ProductDetails = ({ id }: Props) => {
   const { user } = useUserStore();
   const { addToCart } = useCartStore();
+  const pId = id.split("-")[1];
+  const { productname } = useParams();
+  const productnameArr = (productname as string)?.split("-");
+  const cat = productnameArr[productnameArr.length - 1];
   const { data, isLoading } = useQuery({
     queryKey: ["product-details", id],
-    queryFn: async () => await getProductDetails(id, user?.token!),
+    queryFn: async () => await getProductDetails(pId, user?.token!),
     enabled: !!id,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -25,8 +34,6 @@ const ProductDetails = ({ id }: Props) => {
   if (isLoading) {
     return <p>...Loading</p>;
   }
-
-  console.log(data); // Add this line to check the data structure
 
   const handleAddToCart = () => {
     addToCart(data);
@@ -118,14 +125,15 @@ const ProductDetails = ({ id }: Props) => {
                 {data.inventory.quantity === 0 ? "Out of Stock" : "Add to Cart"}
               </button>
               {/* {user && ( */}
-                <div className="ml-2 border px-2 py-1 rounded">
-                  <SaveToWishlist productId={data.id} />
-                </div>
+              <div className="ml-2 border px-2 py-1 rounded">
+                <SaveToWishlist productId={data.id} />
+              </div>
               {/* )} */}
               {/* Wishlist button remains unchanged */}
             </div>
           </div>
         </div>
+        <RelatedProducts productId={pId} categoryId={cat} />
       </div>
     </section>
   );
