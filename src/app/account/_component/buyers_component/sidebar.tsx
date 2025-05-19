@@ -24,7 +24,7 @@ const Sidebar = ({ setIndex, index }: Props) => {
   return (
     <div className="w-[200px] space-y-10  h-full bordery bg-slate-100 py-5 px-3">
       {/* title */}
-      <p className="text-sm font-medium text-slate-400">Navigation Links</p>
+      <p className="text-sm font-medium text-slate-400">Meun</p>
       {/* links */}
       <ul className="flex flex-col gap-3">
         {sidebarLinks.map((el, i) => (

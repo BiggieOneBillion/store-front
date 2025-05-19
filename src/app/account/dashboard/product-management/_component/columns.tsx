@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, CircleOff, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,7 +57,7 @@ export type Product = {
     name: string;
     value: string;
   }>;
-  status: "active" | "inactive" | "out_of_stock";
+  status: "active" | "inactive" | "out_of_stock" | "deactivated";
   rating: number;
   totalRatings: number;
 };
@@ -205,19 +205,19 @@ export const columns: ColumnDef<Product>[] = [
     header: "Discount",
     cell: ({ row }) => {
       const discount = row.original.discount;
-      
+
       if (!discount?.active) {
         return <Badge variant="outline">No Discount</Badge>;
       }
 
       return (
         <DiscountDetailsDialog discount={discount}>
-          <Badge 
-            variant="secondary" 
+          <Badge
+            variant="secondary"
             className="cursor-pointer hover:bg-secondary/80"
           >
-            {discount.type === 'percentage' 
-              ? `${discount.value}% Off` 
+            {discount.type === "percentage"
+              ? `${discount.value}% Off`
               : `$${discount.value} Off`}
           </Badge>
         </DiscountDetailsDialog>
@@ -228,6 +228,13 @@ export const columns: ColumnDef<Product>[] = [
     id: "actions",
     cell: ({ row }) => {
       const product = row.original;
+      if (product.status === "deactivated") {
+        return (
+          <Badge variant="outline">
+            <CircleOff className="h-4 w-4" />
+          </Badge>
+        );
+      }
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -276,5 +283,4 @@ export const columns: ColumnDef<Product>[] = [
       );
     },
   },
-
 ];

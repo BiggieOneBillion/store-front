@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import ProfileSettings from "./buyers_component/profile-settings";
 import PurchaseHistory from "./buyers_component/purchase-history";
 import WishList from "./buyers_component/wish-list";
-import { usePathname, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 
 export const hashArray = ["profile-settings", "purchase-history", "your-wishlist"];
 
@@ -19,7 +19,7 @@ const BuyersDashboard = () => {
   const { user } = useUserStore();
   const [index, setIndex] = useState<number>(0);
   const [hash, setHash] = useState("");
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
     // Set initial hash

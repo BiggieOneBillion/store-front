@@ -1,5 +1,9 @@
-import { CategoryFormValues } from "@/app/account/dashboard/category-management/page";
-import { createCategory } from "@/services/api/categories";
+import {
+  createCategory,
+  deleteCategory,
+  updateCategory,
+} from "@/services/api/categories";
+import { CategoryFormValues } from "@/types/category";
 import { useMutation } from "@tanstack/react-query";
 
 export const useCategory = () => {
@@ -12,43 +16,39 @@ export const useCategory = () => {
       createCategory(params),
   });
 
-  //   const {
-  //     mutateAsync: updateProductFn,
-  //     isPending: isUpdatingProduct,
-  //     error: updateProductError,
-  //   } = useMutation({
-  //     mutationFn: async (params: {
-  //       token: string;
-  //       data: Partial<IProduct>;
-  //       userId: string;
-  //       productId: string;
-  //     }) => updateProduct(params),
-  //   });
+  const {
+    mutateAsync: updateCategoryFn,
+    isPending: isUpdatingCategory,
+    error: updateCategoryError,
+  } = useMutation({
+    mutationFn: async (params: {
+      token: string;
+      data: CategoryFormValues;
+      id: string;
+    }) => updateCategory(params),
+  });
 
-  //   const {
-  //     mutateAsync: deleteProductFn,
-  //     isPending: isDeletingProduct,
-  //     error: deleteProductError,
-  //   } = useMutation({
-  //     mutationFn: async (params: {
-  //       token: string;
-  //       userId: string;
-  //       productId: string;
-  //     }) => deleteProduct(params),
-  //   });
+  const {
+    mutateAsync: deleteCategoryFn,
+    isPending: isDeletingCategory,
+    error: deleteCategoryError,
+  } = useMutation({
+    mutationFn: async (params: { token: string; id: string }) =>
+      deleteCategory(params),
+  });
 
   return {
-    // create store
+    // create category
     createCategoryFn,
     isCreatingCategory,
     createCategoryError,
-    // update store values
-    // updateProductFn,
-    // isUpdatingProduct,
-    // updateProductError,
-    // delete product
-    // deleteProductFn,
-    // isDeletingProduct,
-    // deleteProductError,
+    // update category values
+    updateCategoryFn,
+    isUpdatingCategory,
+    updateCategoryError,
+    // delete category
+    deleteCategoryFn,
+    isDeletingCategory,
+    deleteCategoryError,
   };
 };

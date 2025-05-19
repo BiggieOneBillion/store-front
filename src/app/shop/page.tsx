@@ -7,10 +7,8 @@ import { useUserStore } from "@/store/user-store";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 // import { Product } from "../account/dashboard/product-management/_component/columns";
-import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { v4 } from "uuid";
 
@@ -24,6 +22,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import LoadingCard from "@/components/global/loading-card-loader";
 
 const AllProductPage = () => {
   const { user } = useUserStore();
@@ -58,10 +57,10 @@ const AllProductPage = () => {
           selectedTags.includes("all") ||
           selectedTags.includes(product.tag.toLowerCase());
 
-        const matchesPrice =
-          product.price >= priceRange[0] && product.price <= priceRange[1];
+        // const matchesPrice =
+        //   product.price >= priceRange[0] && product.price <= priceRange[1];
 
-        return matchesCategory && matchesTag && matchesPrice;
+        return matchesCategory && matchesTag;
       }),
     [products, selectedCategories, selectedTags, priceRange]
   );
@@ -121,7 +120,7 @@ const AllProductPage = () => {
                     !selectedCategories.includes(category.name.toLowerCase())
                   )
                 }
-                className="h-8"
+                className="min-h-8 text-wrap "
               >
                 {category.name}
               </Button>
@@ -154,7 +153,8 @@ const AllProductPage = () => {
       </div>
 
       {/* Price Range Section */}
-      <div className="space-y-3">
+      {/* STILL UNDER CONSTRUCTION */}
+      {/* <div className="space-y-3">
         <h3 className="text-sm font-medium tracking-wide text-muted-foreground">
           Price Range
         </h3>
@@ -168,7 +168,7 @@ const AllProductPage = () => {
           <span>${priceRange[0]}</span>
           <span>${priceRange[1]}</span>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 
@@ -204,6 +204,13 @@ const AllProductPage = () => {
 
         {/* Products Grid section */}
         <div className="flex-1">
+          {isLoadingProducts && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, index) => (
+                <LoadingCard key={index} />
+              ))}
+            </div>
+          )}
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts?.length === 0 && (
               <div className="col-span-3" key={v4()}>
@@ -213,17 +220,21 @@ const AllProductPage = () => {
               </div>
             )}
             {filteredProducts?.map((product) => {
-              const discountedPrice = product.discount?.active && product.discount?.value! > 0
-                ? product.discount.type === "percentage"
-                  ? product.price - (product.price * (product.discount?.value! / 100))
-                  : product.price - product.discount?.value!
-                : product.price;
+              const discountedPrice =
+                product.discount?.active && product.discount?.value! > 0
+                  ? product.discount.type === "percentage"
+                    ? product.price -
+                      product.price * (product.discount?.value! / 100)
+                    : product.price - product.discount?.value!
+                  : product.price;
 
               return (
                 <Link
-                  href={`/product/${product.category.name}-${
+                  href={`/product/${product?.category.name || ""}-${
                     product.id
-                  }/${product.name.replaceAll(" ", "-")}-${product.category.id}`}
+                  }/${product.name.replaceAll(" ", "-")}-${
+                    product?.category.id
+                  }`}
                   key={v4()}
                 >
                   <Card key={product.id} className="overflow-hidden">
@@ -239,7 +250,10 @@ const AllProductPage = () => {
                           {product.tag}
                         </Badge>
                         {product.discount?.active && (
-                          <Badge variant="destructive" className="absolute top-2 left-2">
+                          <Badge
+                            variant="destructive"
+                            className="absolute top-2 left-2"
+                          >
                             {product.discount.type === "percentage"
                               ? `-${product.discount.value}%`
                               : `-$${product.discount.value}`}
@@ -248,10 +262,12 @@ const AllProductPage = () => {
                       </div>
                       <div className="p-4 space-y-2">
                         <Badge variant="outline" className="text-gray-500">
-                          {product.category.name}
+                          {product?.category?.name || ""}
                         </Badge>
                         <div className="flex flex-col">
-                          <span className="font-semibold">${discountedPrice.toFixed(2)}</span>
+                          <span className="font-semibold">
+                            ${discountedPrice.toFixed(2)}
+                          </span>
                           {product.discount?.active && (
                             <span className="text-sm text-red-500 line-through">
                               ${product.price.toFixed(2)}

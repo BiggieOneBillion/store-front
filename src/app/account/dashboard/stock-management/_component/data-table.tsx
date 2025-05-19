@@ -71,13 +71,13 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   return (
     <div className="w-full">
       <div className="flex flex-col gap-3 md:gap-0 items-start md:flex-row md:items-center py-4">
-        <Input
+        {/* <Input
           placeholder="Filter by product name..."
           value={(table.getColumn("product.name")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("product.name")?.setFilterValue(event.target.value)}
           className="max-w-sm text-sm"
-        />
-        <Select
+        /> */}
+        {/* <Select
           value={(table.getColumn("type")?.getFilterValue() as string) ?? "all"}
           onValueChange={(value) => table.getColumn("type")?.setFilterValue(value === "all" ? "" : value)}
         >
@@ -91,7 +91,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             <SelectItem value="adjustment">Adjustment</SelectItem>
             <SelectItem value="return">Return</SelectItem>
           </SelectContent>
-        </Select>
+        </Select> */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="md:ml-auto">

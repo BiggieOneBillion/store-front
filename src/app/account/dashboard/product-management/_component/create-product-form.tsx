@@ -250,6 +250,19 @@ export function CreateProductForm() {
     }
   }
 
+  if (isCategoriesLoading) {
+    return <p>Loading categories</p>;
+  }
+
+  if (categories && categories.length == 0) {
+    return (
+      <p>
+        <b>No Categories Avaliable</b>, Please add One or more <b>CATEGORIES</b>
+        then you can add product
+      </p>
+    );
+  }
+
   return (
     <Form {...form}>
       <form

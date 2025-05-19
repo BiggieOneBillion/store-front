@@ -1,9 +1,24 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Info } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { format } from "date-fns";
 
 export type StockHistory = {
@@ -30,10 +45,17 @@ export type StockHistory = {
   updatedAt: string;
 };
 
-export const columns: ColumnDef<StockHistory>[] = [
+// Add this type and helper function at the top of the file
+export type GroupedStockHistory = {
+  productId: string;
+  productName: string;
+  currentStock: number;
+  history: StockHistory[];
+};
+
+export const columns: ColumnDef<GroupedStockHistory>[] = [
   {
-    id: "product.name",
-    accessorKey: "product.name",
+    id: "productName",
     header: ({ column }) => {
       return (
         <Button
@@ -45,84 +67,90 @@ export const columns: ColumnDef<StockHistory>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
-      return <span>{row.original.product.name}</span>;
-    },
-  },
-  // {
-  //   accessorKey: "product.sku",
-  //   header: "SKU",
-  // },
-  {
-    accessorKey: "type",
-    header: "Type",
-    cell: ({ row }) => {
-      const type = row.getValue("type") as string;
-      return (
-        <Badge variant={type === "sale" ? "destructive" : "outline"}>
-          {type}
-        </Badge>
-      );
-    },
+    cell: ({ row }) => <span>{row.original.productName}</span>,
   },
   {
-    accessorKey: "quantity",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Quantity Change
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const quantity = row.getValue("quantity") as number;
-      return (
-        <span className={quantity < 0 ? "text-red-500" : "text-green-500"}>
-          {quantity > 0 ? `+${quantity}` : quantity}
-        </span>
-      );
-    },
-  },
-  {
-    accessorKey: "newStock",
+    accessorKey: "currentStock",
     header: "Current Stock",
   },
-   {
-    accessorKey: "notes",
-    header: "Notes",
-  },
   {
-    accessorKey: "performedBy.name",
-    header: "Performed By",
+    id: "details",
+    header: "Details",
+    cell: ({ row }) => {
+      const { history, productName } = row.original;
+
+      if (history.length === 0) {
+        return <span>No history available.</span>;
+      }
+
+      // function recordNote(record: string): string {
+      //   let note = record.split(" ");
+      //   //  if(note[note.length -1] === ){
+      //   //      return note.join(" ");
+      //   //  }
+      //   note.pop();
+      //   return note.join(" ");
+      // }
+
+      return (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" size="sm">
+              <Info className="h-4 w-4 mr-2" />
+              View History
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Stock History - {productName}</DialogTitle>
+            </DialogHeader>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Quantity Change</TableHead>
+                  <TableHead>Performed By</TableHead>
+                  <TableHead>Notes</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {history.map((record) => (
+                  <TableRow key={record.id}>
+                    <TableCell>
+                      {format(new Date(record.createdAt), "MMM dd, yyyy")}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          record.type === "sale" ? "destructive" : "outline"
+                        }
+                      >
+                        {record.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={
+                          record.quantity < 0
+                            ? "text-red-500"
+                            : "text-green-500"
+                        }
+                      >
+                        {record.quantity > 0
+                          ? `+${record.quantity}`
+                          : record.quantity}
+                      </span>
+                    </TableCell>
+                    <TableCell>{record.performedBy.name}</TableCell>
+                    <TableCell>{record.notes}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </DialogContent>
+        </Dialog>
+      );
+    },
   },
-  // {
-  //   accessorKey: "createdAt",
-  //   header: ({ column }) => {
-  //     return (
-  //       <Button
-  //         variant="ghost"
-  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //       >
-  //         Date
-  //         <ArrowUpDown className="ml-2 h-4 w-4" />
-  //       </Button>
-  //     );
-  //   },
-  //   cell: ({ row }) => {
-  //      console.log(row.original.createdAt)
-  //       // const date = new Date(row.getValue("createdAt")).toISOString().split("T")[0];
-  //       const date = new Date(row.getValue("createdAt")).toLocaleDateString();
-  //       const formatDate = format(new Date(row.getValue("createdAt")), "dd/MM/yyyy")
-  //       console.log(formatDate)
-  //     const day = new Date(row.getValue("createdAt")).getDate();
-  //     const month = new Date(row.getValue("createdAt")).getUTCMonth() + 1;
-  //     const year = new Date(row.getValue("createdAt")).getFullYear();
-  //     // return `${day}/${month}/${year}`;
-  //     return <span>{date}</span>;
-  //   },
-  // },
 ];

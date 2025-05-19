@@ -1,18 +1,18 @@
 "use client";
 import Link from "next/link";
-import { Menu, Search, ShoppingBag, Store, User, X } from "lucide-react";
+import { Menu, Search, Store, User, } from "lucide-react";
 import { ToolTip } from "@/global-components/tool-tip";
 import Logout from "./logout";
-import { useCartStore } from "@/store/cart-store";
+// import { useCartStore } from "@/store/cart-store";
 import CartSheet from "./cart/cart-sheet";
-import { useUserStore } from "@/store/user-store";
+// import { useUserStore } from "@/store/user-store";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 const Navbar = () => {
-  const { cart } = useCartStore();
-  const { user } = useUserStore();
+  // const { cart } = useCartStore();
+  // const { user } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const NavLinks = () => (

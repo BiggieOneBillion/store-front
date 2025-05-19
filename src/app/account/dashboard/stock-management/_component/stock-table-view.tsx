@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { columns } from "./columns";
+import { columns, GroupedStockHistory, StockHistory } from "./columns";
 // Update this import
 import { DataTable } from "./data-table";
 import {
@@ -23,7 +23,6 @@ import { File, ListFilter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useUserStore } from "@/store/user-store";
 import { getStockHistory } from "@/services/api/inventory";
-
 
 const dummyStockHistory = {
   results: [
@@ -113,7 +112,27 @@ export default function StockTableView() {
     initialData: [],
   });
 
- 
+
+  const groupStockHistory = (
+    history: StockHistory[]
+  ): GroupedStockHistory[] => {
+    const grouped = history.reduce((acc, curr) => {
+      console.log("CURRENT ID", curr)
+      const key = curr.product._id;
+      if (!acc[key]) {
+        acc[key] = {
+          productId: curr.product._id,
+          productName: curr.product.name,
+          currentStock: curr.newStock,
+          history: [],
+        };
+      }
+      acc[key].history.push(curr);
+      return acc;
+    }, {} as Record<string, GroupedStockHistory>);
+
+    return Object.values(grouped);
+  };
 
   return (
     <Card>
@@ -160,8 +179,8 @@ export default function StockTableView() {
       <CardContent>
         {isLoading && <p className="text-sm">...Loading</p>}
         {/* {isError && <p className="text-sm">Error loading data</p>} */}
-        {data && data?.results! && (
-          <DataTable columns={columns} data={data.results} />
+        {data && data?.results && (
+          <DataTable columns={columns} data={groupStockHistory(data.results)} />
         )}
       </CardContent>
     </Card>

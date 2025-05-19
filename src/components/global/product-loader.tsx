@@ -1,25 +1,12 @@
-"use client";
-import { ProductCard } from "./product-card";
-import { useQuery } from "@tanstack/react-query";
-import { getAllStoreProducts } from "@/services/api/product";
-import { useUserStore } from "@/store/user-store";
-
-export function FeaturedProduct() {
-  const { user } = useUserStore();
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["all-products"],
-    queryFn: () => getAllStoreProducts(user?.token!),
-  });
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
+const ProductLoader = ({ cardNumber }: { cardNumber: number }) => {
+  return (
+    <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
         <div className="h-8 w-48 bg-gray-200 rounded-md animate-pulse mb-2"></div>
         <div className="h-4 w-24 bg-gray-200 rounded-md animate-pulse"></div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(3)].map((_, index) => (
+        {[...Array(cardNumber)].map((_, index) => (
           <div
             key={index}
             className="bg-white rounded-lg overflow-hidden shadow-sm h-[400px]"
@@ -47,28 +34,6 @@ export function FeaturedProduct() {
         ))}
       </div>
     </div>
-    )
-   
-  }
-
-  if (isError) {
-    return <p>...Error</p>;
-  }
-
-  // Filter products with featured tag
-  const featuredProducts = data?.filter(
-    (product) => product.tag === "featured"
   );
-
-  return (
-    <section className="flex flex-col gap-4 px-4">
-      <h2 className="text-xl font-medium">Featured Products</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6 p-6y">
-        {featuredProducts &&
-          featuredProducts.map((product, index) => (
-            <ProductCard key={index} product={product} />
-          ))}
-      </div>
-    </section>
-  );
-}
+};
+export default ProductLoader;

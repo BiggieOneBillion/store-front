@@ -33,7 +33,6 @@ export default function ProductsTableView() {
     queryFn: async () => await getStoreProducts(user?.id!, user?.token!),
   });
 
-
   return (
     <Card className="w-full overflow-auto">
       <CardHeader>

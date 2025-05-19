@@ -58,7 +58,11 @@ const WishList = () => {
   }
 
   if (!data || data.products.length === 0) {
-    return <p className="mt-5 text-2xl font-semibold text-black/10">No Product In Wish List</p>;
+    return (
+      <p className="mt-5 text-2xl font-semibold text-black/10">
+        No Product In Wish List
+      </p>
+    );
   }
 
   return (

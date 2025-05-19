@@ -77,9 +77,9 @@ export default function ProfileSettings() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values);
+      // console.log(values);
 
-      const response = await updateUser({
+       await updateUser({
         userId: user?.id!,
         data: {
           name: values.name,
