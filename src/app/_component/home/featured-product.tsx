@@ -3,56 +3,38 @@ import { ProductCard } from "./product-card";
 import { useQuery } from "@tanstack/react-query";
 import { getAllStoreProducts } from "@/services/api/product";
 import { useUserStore } from "@/store/user-store";
+import { ProductCardSkeletonGrid } from "@/components/global/skeletons";
+import { ErrorMessage } from "@/components/global/error-message";
+import { EmptyState } from "@/components/global/empty-state";
+import { Package } from "lucide-react";
 
 export function FeaturedProduct() {
   const { user } = useUserStore();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["all-products"],
     queryFn: () => getAllStoreProducts(user?.token!),
   });
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <div className="h-8 w-48 bg-gray-200 rounded-md animate-pulse mb-2"></div>
-        <div className="h-4 w-24 bg-gray-200 rounded-md animate-pulse"></div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(3)].map((_, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg overflow-hidden shadow-sm h-[400px]"
-          >
-            {/* Image skeleton */}
-            <div className="relative aspect-[4/3] bg-gray-200 animate-pulse"></div>
-
-            <div className="p-4">
-              {/* Category badge skeleton */}
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-5 w-16 bg-gray-200 rounded-full animate-pulse"></div>
-              </div>
-
-              {/* Product name skeleton */}
-              <div className="h-5 w-3/4 bg-gray-200 rounded-md animate-pulse mb-2"></div>
-
-              {/* Description skeleton */}
-              <div className="h-3 w-full bg-gray-200 rounded-md animate-pulse mb-1"></div>
-              <div className="h-3 w-5/6 bg-gray-200 rounded-md animate-pulse mb-3"></div>
-
-              {/* Price skeleton */}
-              <div className="h-6 w-20 bg-gray-200 rounded-md animate-pulse mt-4"></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-    )
-   
+      <section className="flex flex-col gap-4 px-4">
+        <div className="h-8 w-48 bg-muted animate-pulse rounded-md" />
+        <ProductCardSkeletonGrid count={3} />
+      </section>
+    );
   }
 
   if (isError) {
-    return <p>...Error</p>;
+    return (
+      
+      <ErrorMessage
+        title="Failed to Load Products"
+        message="We couldn't load the featured products"
+        error={error}
+        onRetry={refetch}
+      />
+      
+    );
   }
 
   // Filter products with featured tag
@@ -60,14 +42,31 @@ export function FeaturedProduct() {
     (product) => product.tag === "featured"
   );
 
+  if (!featuredProducts || featuredProducts.length === 0) {
+    return (
+       <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <p className="text-xl font-medium tracking-tight font-semibold text-black/80">Categories</p>
+          <Package className="h-4 w-4 text-muted-foreground" />
+        </div>
+      <EmptyState
+        icon={<Package className="h-12 w-12 text-muted-foreground" />}
+        title="No Featured Products"
+        description="There are no featured products available at the moment"
+        secondaryActionLabel="Browse All Products"
+        secondaryActionHref="/shop"
+      />
+      </div>
+    );
+  }
+
   return (
     <section className="flex flex-col gap-4 px-4">
       <h2 className="text-xl font-medium">Featured Products</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6 p-6y">
-        {featuredProducts &&
-          featuredProducts.map((product, index) => (
-            <ProductCard key={index} product={product} />
-          ))}
+        {featuredProducts.map((product, index) => (
+          <ProductCard key={index} product={product} />
+        ))}
       </div>
     </section>
   );

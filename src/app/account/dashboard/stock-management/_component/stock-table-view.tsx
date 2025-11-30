@@ -112,12 +112,11 @@ export default function StockTableView() {
     initialData: [],
   });
 
-
   const groupStockHistory = (
     history: StockHistory[]
   ): GroupedStockHistory[] => {
     const grouped = history.reduce((acc, curr) => {
-      console.log("CURRENT ID", curr)
+      // console.log("CURRENT ID", curr)
       const key = curr.product._id;
       if (!acc[key]) {
         acc[key] = {

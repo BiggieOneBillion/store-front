@@ -58,7 +58,11 @@ interface Discount {
   id: string;
 }
 
-export function DiscountsTable({ form, setEditingId, setIsEditing }: DiscountsTableProps) {
+export function DiscountsTable({
+  form,
+  setEditingId,
+  setIsEditing,
+}: DiscountsTableProps) {
   const { user } = useUserStore();
   const { data: discounts = [], isLoading } = useQuery<Discount[]>({
     queryKey: ["discount-table"],
@@ -120,7 +124,7 @@ export function DiscountsTable({ form, setEditingId, setIsEditing }: DiscountsTa
       queryClient.invalidateQueries({ queryKey: ["discount-table"] });
       toast.success("Discount deleted successfully");
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       toast(`Error in deleting discount: ${deleteDiscountError?.message}`);
     }
   };
@@ -139,7 +143,7 @@ export function DiscountsTable({ form, setEditingId, setIsEditing }: DiscountsTa
       queryClient.invalidateQueries({ queryKey: ["discount-table"] });
       toast.success("Discount Updated successfully");
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       toast(`Error in deleting discount: ${deactivateDiscountError?.message}`);
     }
   };
@@ -196,7 +200,7 @@ export function DiscountsTable({ form, setEditingId, setIsEditing }: DiscountsTa
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
                     onClick={() => {
-                      console.log("Toggle status", discount.id);
+                      // console.log("Toggle status", discount.id);
                       handleActiveStatus(discount.id, !discount.active);
                     }}
                   >

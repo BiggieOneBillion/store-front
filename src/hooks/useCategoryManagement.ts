@@ -93,7 +93,7 @@ export const useCategoryManagement = () => {
         );
         return;
       }
-      console.log("DELETE ERROR", deleteCategoryError);
+      // console.log("DELETE ERROR", deleteCategoryError);
       toast.error("Processing Error, Please Try Again Later");
     }
   };
@@ -101,13 +101,13 @@ export const useCategoryManagement = () => {
   const handleStatusToggle = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
     // Add status update API call here
-    console.log("Toggling status:", id, newStatus);
+    // console.log("Toggling status:", id, newStatus);
   };
 
   const onSubmit = async (values: CategoryFormValues) => {
-    console.log(values);
+    // console.log(values);
 
-    console.log("isEditing", isEditing);
+    // console.log("isEditing", isEditing);
 
     if (!selectedFile) {
       toast.error("Please upload a category image");

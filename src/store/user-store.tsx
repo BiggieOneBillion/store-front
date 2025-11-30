@@ -13,6 +13,7 @@ interface User {
 interface UserStore {
   user: User | null;
   setUser: (user: User) => void;
+  updateUser: (user: Partial<User>) => void;
   clearUser: () => void;
   hasHydrated: boolean;
   setHasHydrated: (hydrated: boolean) => void;
@@ -39,6 +40,8 @@ export const useUserStore = create<UserStore>()(
       user: null, // Initial state
       hasHydrated: false,
       setUser: (user) => set({ user }),
+      updateUser: (userInfo) =>
+        set((state) => ({ user: { ...(state.user as User), ...userInfo } })),
       clearUser: () => set({ user: null }),
       setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
     }),

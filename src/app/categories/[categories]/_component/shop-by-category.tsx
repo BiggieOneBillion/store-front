@@ -49,7 +49,10 @@ const ShopByCategory = ({ categories }: Props) => {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {[...Array(8)].map((_, index) => (
-            <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm">
+            <div
+              key={index}
+              className="bg-white rounded-lg overflow-hidden shadow-sm"
+            >
               <div className="h-64 bg-gray-200 animate-pulse"></div>
               <div className="p-4">
                 <div className="h-4 w-16 bg-gray-200 rounded-md animate-pulse mb-2"></div>
@@ -64,7 +67,7 @@ const ShopByCategory = ({ categories }: Props) => {
     );
   }
 
-  // console.log("Categories", categoriesData);
+  // // console.log("Categories", categoriesData);
 
   if (!categoryExists) {
     return (
@@ -83,46 +86,48 @@ const ShopByCategory = ({ categories }: Props) => {
             Available Categories
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {categoriesData?.map((category: any) => (
-              <Link
-                href={`/categories/${category.name}`}
-                key={category.id}
-                className="group"
-              >
-                <div
-                  className="relative h-64 rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-[1.01] ease-in-out"
-                  style={{
-                    backgroundImage:
-                      `url(${category.image})` ||
-                      "url('/categories/default.jpg')",
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
+            {categoriesData &&
+              Array.isArray(categoriesData) &&
+              categoriesData?.map((category: any) => (
+                <Link
+                  href={`/categories/${category.name}`}
+                  key={category.id}
+                  className="group"
                 >
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-black bg-opacity-40 transition-opacity group-hover:bg-opacity-30" />
+                  <div
+                    className="relative h-64 rounded-lg overflow-hidden transition-transform duration-300 group-hover:scale-[1.01] ease-in-out"
+                    style={{
+                      backgroundImage:
+                        `url(${category.image})` ||
+                        "url('/categories/default.jpg')",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  >
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-black bg-opacity-40 transition-opacity group-hover:bg-opacity-30" />
 
-                  {/* Category Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-xl font-semibold mb-2 capitalize">
-                          {category.name}
-                        </h3>
-                        <p className="text-xs md:text-sm opacity-90 line-clamp-2 capitalize">
-                          {category.description}
-                        </p>
-                      </div>
-                      {/* {category.featured && (
+                    {/* Category Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-xl font-semibold mb-2 capitalize">
+                            {category.name}
+                          </h3>
+                          <p className="text-xs md:text-sm opacity-90 line-clamp-2 capitalize">
+                            {category.description}
+                          </p>
+                        </div>
+                        {/* {category.featured && (
                     <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded-full">
                       Featured
                     </span>
                   )} */}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
           </div>
         </div>
       </div>
@@ -138,23 +143,26 @@ const ShopByCategory = ({ categories }: Props) => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, index) => (
-            <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm h-[400px]">
+            <div
+              key={index}
+              className="bg-white rounded-lg overflow-hidden shadow-sm h-[400px]"
+            >
               {/* Image skeleton */}
               <div className="relative aspect-[4/3] bg-gray-200 animate-pulse"></div>
-              
+
               <div className="p-4">
                 {/* Category badge skeleton */}
                 <div className="flex items-center gap-2 mb-2">
                   <div className="h-5 w-16 bg-gray-200 rounded-full animate-pulse"></div>
                 </div>
-                
+
                 {/* Product name skeleton */}
                 <div className="h-5 w-3/4 bg-gray-200 rounded-md animate-pulse mb-2"></div>
-                
+
                 {/* Description skeleton */}
                 <div className="h-3 w-full bg-gray-200 rounded-md animate-pulse mb-1"></div>
                 <div className="h-3 w-5/6 bg-gray-200 rounded-md animate-pulse mb-3"></div>
-                
+
                 {/* Price skeleton */}
                 <div className="h-6 w-20 bg-gray-200 rounded-md animate-pulse mt-4"></div>
               </div>
@@ -165,7 +173,7 @@ const ShopByCategory = ({ categories }: Props) => {
     );
   }
 
-  // console.log("Products", productsData);
+  // // console.log("Products", productsData);
 
   // Filter products by category
   const filteredProducts = productsData?.filter(

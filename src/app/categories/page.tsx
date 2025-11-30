@@ -55,7 +55,7 @@ const CategoriesPage = () => {
 
   if (!categoriesData) return <div>No categories found.</div>;
 
-  // console.log(categoriesData);
+  // // console.log(categoriesData);
 
   return (
     <div className="container mx-auto px-4 pb-8 md:py-8">

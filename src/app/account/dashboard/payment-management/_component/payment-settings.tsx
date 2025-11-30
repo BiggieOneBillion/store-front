@@ -74,12 +74,12 @@ export default function PaymentSettings() {
   });
 
   function onBankSubmit(values: z.infer<typeof bankAccountSchema>) {
-    console.log(values);
+    // console.log(values);
     toast.success("Bank account details saved successfully");
   }
 
   function onPaypalSubmit(values: z.infer<typeof paypalSchema>) {
-    console.log(values);
+    // console.log(values);
     toast.success("PayPal details saved successfully");
   }
 

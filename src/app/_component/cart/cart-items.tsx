@@ -1,49 +1,10 @@
-import { useState } from "react";
 import { CartCard } from "./cart-card";
 import { useCartStore } from "@/store/cart-store";
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  images: string[];
-  quantity: number;
-  store: string;
-}
-
-const initialCartItems: CartItem[] = [
-  {
-    id: "prod_002",
-    name: "Organic Cotton T-Shirt",
-    price: 24.99,
-    images: ["/placeholder.svg?height=300&width=300"],
-    quantity: 1,
-    store: "EcoWear",
-  },
-  {
-    id: "prod_003",
-    name: "Smart Home Security Camera",
-    price: 79.99,
-    images: ["/placeholder.svg?height=300&width=300"],
-    quantity: 1,
-    store: "SafeHouse",
-  },
-  {
-    id: "prod_001",
-    name: "Wireless Bluetooth Headphones",
-    price: 129.99,
-    images: ["/placeholder.svg?height=300&width=300"],
-    quantity: 3,
-    store: "TechGadgets",
-  },
-];
 
 export function CartItems() {
   const { cart, updateQuantity, removeFromCart, getTotalPrice } =
     useCartStore();
-
-
-    console.log("CART", cart);
 
 
   return (

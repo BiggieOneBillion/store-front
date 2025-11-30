@@ -1,23 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { useCartStore } from "@/store/cart-store";
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  images: string[];
-  quantity: number;
-  // store: {
-  //   id: string;
-  //   name: string;
-  // };
-}
+import { CartItem, useCartStore } from "@/store/cart-store";
 
 interface CartCardProps {
   item: CartItem;
@@ -25,7 +12,7 @@ interface CartCardProps {
 }
 
 export function CartCard({ item, onRemove }: CartCardProps) {
-  console.log("CART ITEMS", item);
+  // // console.log("CART ITEMS", item);
   const { updateQuantity } = useCartStore();
 
   const handleIncrease = () => {
@@ -54,12 +41,37 @@ export function CartCard({ item, onRemove }: CartCardProps) {
         <div className="flex-1">
           <h3 className="font-semibold mb-1">{item.name}</h3>
           <div className="flex items-baseline gap-2 mb-2">
-            <p className="font-semibold">
+            {/* <p className="font-semibold">
               ${(item.price * item.quantity).toFixed(2)}
-            </p>
-            <p className="text-xs text-muted-foreground">
+            </p> */}
+            {item.discount && item?.discount.value! > 0 ? (
+              <>
+                <p className="font-semibold text-primary">
+                  $
+                  {item.discount.type === "percentage" &&
+                    (
+                      (item.price -
+                        (item.price * item?.discount.value!) / 100) *
+                      item.quantity
+                    ).toFixed(2)}
+                </p>
+                <p className="line-through text-muted-foreground text-sm">
+                  ${(item.price * item.quantity).toFixed(2)}
+                </p>
+                <p className="text-xs text-green-600">
+                  {item.discount.value}%{" "}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-semibold">
+                  ${(item.price * item.quantity).toFixed(2)}
+                </p>
+              </>
+            )}
+            {/* <p className="text-xs text-muted-foreground">
               ${item.price.toFixed(2)} each
-            </p>
+            </p> */}
           </div>
           <section className="flex items-baseline justify-between">
             <div className="flex items-center">

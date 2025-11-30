@@ -1,19 +1,18 @@
 "use client";
 
 import { useUserStore } from "@/store/user-store";
-import Link from "next/link";
 import Sidebar from "./buyers_component/sidebar";
 import { useEffect, useState } from "react";
 import ProfileSettings from "./buyers_component/profile-settings";
 import PurchaseHistory from "./buyers_component/purchase-history";
 import WishList from "./buyers_component/wish-list";
-import {  useRouter } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { User, Clock, Heart } from "lucide-react";
 
 export const hashArray = ["profile-settings", "purchase-history", "your-wishlist"];
 
-// Add these imports
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Clock, Heart } from "lucide-react";
+
+
 
 const BuyersDashboard = () => {
   const { user } = useUserStore();

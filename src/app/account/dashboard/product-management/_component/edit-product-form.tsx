@@ -151,7 +151,7 @@ export function EditProductForm({ data, productId }: Props) {
       categoryValue = productData.category;
     } else {
       categoryValue = data.categoryId!;
-      console.log(categoryValue);
+      // console.log(categoryValue);
     }
 
     const input = {
@@ -179,7 +179,7 @@ export function EditProductForm({ data, productId }: Props) {
       })),
     };
 
-    console.log(input);
+    // console.log(input);
 
     try {
       await updateProductFn({
@@ -250,7 +250,7 @@ export function EditProductForm({ data, productId }: Props) {
     },
   });
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <Form {...form}>

@@ -68,7 +68,7 @@ export function AddStockForm() {
     },
   });
 
-  console.log(form.formState.errors);
+  // console.log(form.formState.errors);
 
   const { createStockFn, createStockError, isCreatingStock } = useInventory();
 
@@ -76,12 +76,12 @@ export function AddStockForm() {
     const input = { ...value, referenceId: null };
     try {
       const res = await createStockFn({ token: user?.token!, data: input });
-      console.log(res);
+      // console.log(res);
       toast.success("Stock updated successfully");
       form.reset();
     } catch (error) {
-    //   console.error(error);
-    //   console.log("Error creating stock:", createStockError?.message);
+      //   // console.error(error);
+      //   // console.log("Error creating stock:", createStockError?.message);
       toast.error("Failed to update stock");
     }
   }

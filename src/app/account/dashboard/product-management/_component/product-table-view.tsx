@@ -24,11 +24,13 @@ import { CreateNewProductDialog } from "./create-new-product-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { getStoreProducts } from "@/services/api/product";
 import { useUserStore } from "@/store/user-store";
+import { DataTableSkeleton } from "@/components/global/skeletons";
+import { ErrorMessage } from "@/components/global/error-message";
 
 export default function ProductsTableView() {
 
   const { user } = useUserStore();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["store-products"],
     queryFn: async () => await getStoreProducts(user?.id!, user?.token!),
   });
@@ -74,8 +76,16 @@ export default function ProductsTableView() {
         </section>
       </CardHeader>
       <CardContent>
-        {isLoading && <p className="text-sm">...Loading</p>}
-        {isError && <p className="text-sm">Error loading data</p>}
+        {isLoading && <DataTableSkeleton columnCount={6} rowCount={10} />}
+        {isError && (
+          <ErrorMessage
+            title="Failed to Load Products"
+            message="We couldn't load your products"
+            error={error}
+            onRetry={refetch}
+            showHomeButton={false}
+          />
+        )}
         {data && Array.isArray(data) && (
           <DataTable columns={columns} data={data} />
         )}

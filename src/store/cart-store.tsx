@@ -86,7 +86,21 @@ export const useCartStore = create<CartState>()(
 
       getTotalPrice: () => {
         return get().cart.reduce(
-          (total, item) => total + item.price * item.quantity,
+          // (total, item) => total + item.price * item.quantity,
+          (total, item) => {
+            if (item.discount?.active) {
+              const price = item.discount.type === "percentage";
+              if (price) {
+                const itemPrice =
+                  item.price - item.price * (item.discount.value! / 100);
+                return total + itemPrice * item.quantity;
+              } else {
+                const itemPrice = item.price - item.discount.value!;
+                return total + itemPrice * item.quantity;
+              }
+            }
+            return total + item.price * item.quantity;
+          },
           0
         );
       },

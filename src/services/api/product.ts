@@ -141,3 +141,12 @@ export const getAllStoreProducts = async (
 
   return response.data;
 };
+
+export const filterProducts = async (param: { name: string }) => {
+  const response = await api.get(`${baseURL}/filter?name=${param.name}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};

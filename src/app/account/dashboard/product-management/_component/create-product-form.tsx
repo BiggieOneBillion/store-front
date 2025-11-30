@@ -156,7 +156,7 @@ export function CreateProductForm() {
 
   async function onSubmit(values: ProductFormValues) {
     const productData = { ...values, variants };
-    // console.log(productData);
+    // // console.log(productData);
 
     const input = {
       name: productData.name,
@@ -329,6 +329,7 @@ export function CreateProductForm() {
                             No categories available
                           </SelectItem>
                         ) : (
+                          categories &&
                           categories
                             ?.filter((category) => category.status === "active")
                             .map((category) => (

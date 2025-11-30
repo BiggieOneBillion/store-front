@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Menu, Search, Store, User, } from "lucide-react";
+import { Menu, Search, Store, User } from "lucide-react";
 import { ToolTip } from "@/global-components/tool-tip";
 import Logout from "./logout";
 // import { useCartStore } from "@/store/cart-store";
@@ -9,10 +9,12 @@ import CartSheet from "./cart/cart-sheet";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useUserStore } from "@/store/user-store";
+import SearchInput from "./search/search-input";
 
 const Navbar = () => {
   // const { cart } = useCartStore();
-  // const { user } = useUserStore();
+  const { user } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const NavLinks = () => (
@@ -56,7 +58,10 @@ const Navbar = () => {
 
       <section className="flex items-center gap-4 ml-auto">
         {/* search */}
-        <div className="hidden lg:flex items-center gap-1 w-[200px] border rounded-md px-2 py-1">
+        <div className="hidden lg:block w-[260px]">
+          <SearchInput />
+        </div>
+        {/* <div className="hidden lg:flex items-center gap-1 w-[200px] border rounded-md px-2 py-1">
           <input
             type="text"
             placeholder="Search for products..."
@@ -65,18 +70,20 @@ const Navbar = () => {
           <button>
             <Search size={17} />
           </button>
-        </div>
-        
+        </div> */}
+
         <ToolTip message="cart">
           <CartSheet />
         </ToolTip>
-        
-        <ToolTip message="my account">
-          <Link href={"/account"}>
-            <User size={17} />
-          </Link>
-        </ToolTip>
-        
+
+        {user && ( // If the user is not null, then it means they are logged in
+          <ToolTip message="my account">
+            <Link href={"/account"}>
+              <User size={17} />
+            </Link>
+          </ToolTip>
+        )}
+
         <div className="hidden md:block">
           <Logout />
         </div>
@@ -91,16 +98,7 @@ const Navbar = () => {
           <SheetContent side="left" className="w-[300px] sm:w-[400px]">
             <div className="flex flex-col gap-8 mt-8">
               <NavLinks />
-              <div className="flex items-center gap-1 border rounded-md px-2 py-1">
-                <input
-                  type="text"
-                  placeholder="Search for products..."
-                  className="w-full outline-none placeholder:text-sm"
-                />
-                <button>
-                  <Search size={17} />
-                </button>
-              </div>
+              <SearchInput className="w-full" />
               <Logout />
             </div>
           </SheetContent>

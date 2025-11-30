@@ -8,11 +8,8 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-// import { Product } from "../account/dashboard/product-management/_component/columns";
 import Link from "next/link";
 import { v4 } from "uuid";
-
-// Add these imports at the top
 import { SlidersHorizontal } from "lucide-react";
 import {
   Sheet,
@@ -29,6 +26,7 @@ const AllProductPage = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<number[]>([0, 30000]);
+  const [multiCategory, setMultiCategory] = useState(false);
 
   const { data: products, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["all-products"],
@@ -57,76 +55,106 @@ const AllProductPage = () => {
           selectedTags.includes("all") ||
           selectedTags.includes(product.tag.toLowerCase());
 
-        // const matchesPrice =
-        //   product.price >= priceRange[0] && product.price <= priceRange[1];
-
         return matchesCategory && matchesTag;
       }),
     [products, selectedCategories, selectedTags, priceRange]
   );
 
-  // Checkbox handlers
-  const handleCategoryChange = (category: string, checked: boolean) => {
-    if (checked) {
-      setSelectedCategories([...selectedCategories, category.toLowerCase()]);
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    setSelectedTags([]);
+    setPriceRange([0, 30000]);
+  };
+
+  // Category selection logic
+  const handleCategoryChange = (category: string) => {
+    if (multiCategory) {
+      // Multi-select logic
+      if (selectedCategories.includes(category.toLowerCase())) {
+        setSelectedCategories(
+          selectedCategories.filter((c) => c !== category.toLowerCase())
+        );
+      } else {
+        setSelectedCategories([...selectedCategories, category.toLowerCase()]);
+      }
     } else {
-      setSelectedCategories(
-        selectedCategories.filter((c) => c !== category.toLowerCase())
-      );
+      // Single-select logic
+      setSelectedCategories([category.toLowerCase()]);
     }
   };
 
   const handleTagChange = (tag: string, checked: boolean) => {
-    if (checked) {
-      setSelectedTags([...selectedTags, tag.toLowerCase()]);
-    } else {
-      setSelectedTags(selectedTags.filter((t) => t !== tag.toLowerCase()));
-    }
+    // multi-tag select logic
+    // if (checked) {
+    //   setSelectedTags([...selectedTags, tag.toLowerCase()]);
+    // } else {
+    //   setSelectedTags(selectedTags.filter((t) => t !== tag.toLowerCase()));
+    // }
+    setSelectedTags([tag.toLowerCase()]);
   };
 
   // Create a FilterContent component for reuse
   const FilterContent = () => (
     <div className="space-y-6">
-      {/* Categories Section */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium tracking-wide text-muted-foreground">
-          Categories
-        </h3>
-        <div className="grid grid-cols-2 gap-2">
+      <section className="space-y-3">
+        {/* Multi-category toggle */}
+        <div className="mb-2 flex items-center gap-2">
           <Button
-            variant={selectedCategories.includes("all") ? "default" : "outline"}
+            variant={multiCategory ? "default" : "outline"}
             size="sm"
-            onClick={() =>
-              handleCategoryChange("all", !selectedCategories.includes("all"))
-            }
-            className="h-8"
+            onClick={() => {
+              setMultiCategory((prev) => !prev);
+              // If disabling multi, keep only the first selected category
+              if (multiCategory && selectedCategories.length > 1) {
+                setSelectedCategories([selectedCategories[0]]);
+              }
+            }}
           >
-            All
+            {multiCategory ? "Disable" : "Enable"}
           </Button>
-          {categories &&
-            Array.isArray(categories) &&
-            categories?.map((category: { name: string; id: string }) => (
-              <Button
-                key={category.id}
-                variant={
-                  selectedCategories.includes(category.name.toLowerCase())
-                    ? "default"
-                    : "outline"
-                }
-                size="sm"
-                onClick={() =>
-                  handleCategoryChange(
-                    category.name,
-                    !selectedCategories.includes(category.name.toLowerCase())
-                  )
-                }
-                className="min-h-8 text-wrap "
-              >
-                {category.name}
-              </Button>
-            ))}
+          <span className="text-xs text-muted-foreground">
+            {/* {multiCategory
+            ? "You can select multiple categories"
+            : "Only one category can be selected"} */}
+            Multi-Category
+          </span>
         </div>
-      </div>
+        {/* Categories Section */}
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium tracking-wide text-muted-foreground">
+            Categories
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant={
+                selectedCategories.includes("all") ? "default" : "outline"
+              }
+              size="sm"
+              onClick={() => handleCategoryChange("all")}
+              className="h-8"
+            >
+              All
+            </Button>
+            {categories &&
+              Array.isArray(categories) &&
+              categories?.map((category: { name: string; id: string }) => (
+                <Button
+                  key={category.id}
+                  variant={
+                    selectedCategories.includes(category.name.toLowerCase())
+                      ? "default"
+                      : "outline"
+                  }
+                  size="sm"
+                  onClick={() => handleCategoryChange(category.name)}
+                  className="min-h-8 text-wrap "
+                >
+                  {category.name}
+                </Button>
+              ))}
+          </div>
+        </div>
+      </section>
 
       {/* Tags Section */}
       <div className="space-y-3">
@@ -151,24 +179,19 @@ const AllProductPage = () => {
           ))}
         </div>
       </div>
-
-      {/* Price Range Section */}
-      {/* STILL UNDER CONSTRUCTION */}
-      {/* <div className="space-y-3">
-        <h3 className="text-sm font-medium tracking-wide text-muted-foreground">
-          Price Range
-        </h3>
-        <Slider
-          defaultValue={[0, 30000]}
-          max={30000}
-          step={10}
-          onValueChange={setPriceRange}
-        />
-        <div className="flex justify-between text-sm">
-          <span>${priceRange[0]}</span>
-          <span>${priceRange[1]}</span>
-        </div>
-      </div> */}
+      <div className="pt-4 border-t">
+        <Button
+          disabled={
+            isLoadingProducts ||
+            (!selectedCategories.length && !selectedTags.length)
+          }
+          className="text-sm w-full"
+          size={"sm"}
+          onClick={clearFilters}
+        >
+          Clear Filters
+        </Button>
+      </div>
     </div>
   );
 
@@ -230,6 +253,7 @@ const AllProductPage = () => {
 
               return (
                 <Link
+                  className={`${product.inventory.quantity === 0 && "hidden"}`}
                   href={`/product/${product?.category.name || ""}-${
                     product.id
                   }/${product.name.replaceAll(" ", "-")}-${

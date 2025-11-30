@@ -13,6 +13,16 @@ interface IUserAddress {
   zipCode: string;
 }
 
+
+export interface IUserUpdate {
+  name: string;
+  email: string;
+  role: string;
+  phoneNumber: string;
+  token?: string;
+}
+
+
 export interface IUser {
   name: string;
   email: string;

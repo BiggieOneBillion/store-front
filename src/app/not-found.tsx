@@ -1,20 +1,42 @@
 import Link from "next/link";
+import { FileQuestion, Home, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function NotFound() {
   return (
-    <section className="fixed top-0 left-0 w-full h-screen flex items-center justify-center bg-white text-black">
-      <div className="flex flex-col items-center gap-3">
-        <h2 className="text-3xl font-bold text-black/10">404 | Not Found</h2>
-        <p className="text-gray-600 capitalize">
-          Could not find requested resource
-        </p>
-        <Link
-          href="/"
-          className="py-1 px-2 border rounded-md text-sm hover:border-black/30 transition-colors duration-200"
-        >
-          Return Home
-        </Link>
-      </div>
-    </section>
+    <div className="flex items-center justify-center min-h-screen p-4 bg-background">
+      <Card className="max-w-md w-full">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <FileQuestion className="h-16 w-16 text-muted-foreground" />
+          </div>
+          <CardTitle className="text-2xl">404 - Page Not Found</CardTitle>
+          <CardDescription>
+            The page you're looking for doesn't exist or has been moved.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-2">
+          <Button asChild className="gap-2">
+            <Link href="/">
+              <Home className="h-4 w-4" />
+              Go Home
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="gap-2">
+            <Link href="/shop">
+              <Search className="h-4 w-4" />
+              Browse Products
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

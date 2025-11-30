@@ -15,6 +15,7 @@ import {
   ShoppingCart,
   TableOfContents,
   Users2,
+  Component,
 } from "lucide-react";
 import {
   Tooltip,
@@ -65,6 +66,11 @@ export function SidebarNav() {
       href: "/account/dashboard/stock-management",
       icon: Layers,
       label: "Stock report",
+    },
+    {
+      href: "/account/dashboard/customization",
+      icon: Component,
+      label: "Customization",
     },
   ];
 

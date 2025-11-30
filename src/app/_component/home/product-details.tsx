@@ -115,9 +115,10 @@ const ProductDetails = ({ id }: Props) => {
               </div>
               <button
                 onClick={handleAddToCart}
-                // disabled={
-                //   data.inventory.quantity === 0 || user?.role !== "buyer"
-                // }
+                disabled={
+                  data.inventory.quantity === 0
+                  // || user?.role !== "buyer"
+                }
                 className="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 
                   focus:outline-none hover:bg-indigo-600 rounded disabled:bg-gray-400"
               >

@@ -10,7 +10,7 @@ type Props = {
   productId: string;
 };
 
-const SaveToWishlist = ({ productId}: Props) => {
+const SaveToWishlist = ({ productId }: Props) => {
   const [isPending, startTransition] = useTransition();
 
   const { user } = useUserStore();
@@ -34,7 +34,7 @@ const SaveToWishlist = ({ productId}: Props) => {
         });
         toast.success("Added to wishlist");
       } catch (error) {
-        console.log(createWishListError)
+        // console.log(createWishListError)
         toast.success(
           `Operation Unsuccessful: ${createWishListError?.message}`
         );

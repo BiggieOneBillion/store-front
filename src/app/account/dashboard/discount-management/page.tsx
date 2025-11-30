@@ -71,7 +71,7 @@ export default function DiscountManagementPage() {
   const queryClient = useQueryClient();
 
   async function onSubmit(values: DiscountFormValues) {
-    // console.log(values);
+    // // console.log(values);
     try {
       if (isEditing) {
         const { code, ...others } = values;
@@ -101,8 +101,8 @@ export default function DiscountManagementPage() {
         },
       });
     } catch (error) {
-      console.error(error);
-      console.log("ERROR IN POSTING", createDiscountError);
+      // console.error(error);
+      // console.log("ERROR IN POSTING", createDiscountError);
       toast(`Error is : ${createDiscountError?.message}`);
     }
   }
@@ -169,7 +169,9 @@ export default function DiscountManagementPage() {
         <div className="flex flex-col gap-5 md:gap-0 md:flex-row justify-between items-start md:items-center mb-4">
           <section>
             <h2 className="text-lg font-medium">Discounts</h2>
-            <p className="text-sm text-gray-500">You can manage your discounts here.</p>
+            <p className="text-sm text-gray-500">
+              You can manage your discounts here.
+            </p>
           </section>
           <section className="md:hidden">
             <Dialog

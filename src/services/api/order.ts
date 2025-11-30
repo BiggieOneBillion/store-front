@@ -110,3 +110,19 @@ export const getAllStoreProducts = async (
 
   return response.data;
 };
+
+export const cancelOrder = async (params: {
+  token: string;
+  orderId: string;
+}) => {
+  const response = await api.patch(
+    `${baseURL}/cancel/${params.orderId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${params.token}`,
+      },
+    }
+  );
+  return response.data;
+};

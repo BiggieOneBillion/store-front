@@ -63,7 +63,8 @@ export default function RegisterForm() {
     },
   });
 
-  const { register, isRegistering, registerError } = useAuth();
+  const { registerError, registerToBackend, isRegisteringToBackend } =
+    useAuth();
 
   const setUser = useUserStore((state) => state.setUser);
 
@@ -73,32 +74,28 @@ export default function RegisterForm() {
     try {
       // Assuming an async registration function
       const { confirmPassword, ...others } = values;
-      // register the user
-      const response = await register({
+
+      const response = await registerToBackend({
         ...others,
         role: "buyer",
       });
 
-      console.log(response)
+      // console.log("REGISTERATION DETAILS---1", response);
 
       setUser({
-        id: response.newUser.id,
-        name: response.newUser.name,
-        role: response.newUser.role,
-        email: response.newUser.email,
-        token: response.tokens.access.token,
-        refreshToken: response.tokens.refresh.token,
+        id: response.data.user.id,
+        name: response.data.user.name,
+        role: response.data.user.role,
+        email: response.data.user.email,
+        token: response.data.token,
+        refreshToken: response.data.accessToken,
       });
 
       router.push("/");
       toast.success("Registration Completed");
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error(
-        `Error Registering ${
-          registerError?.message
-        }`
-      );
+      // console.error("Form submission error", error);
+      toast.error(`Error Registering ${registerError?.message}`);
     }
   }
 
@@ -106,7 +103,7 @@ export default function RegisterForm() {
     <div className="flex flex-col gap-4 min-h-[60vh] h-full w-full items-center justify-center px-4">
       <h1 className="flex items-center gap-2">
         <Store size={16} />
-        <span>STOREFRONT</span>
+        <span>MULTISTORE</span>
       </h1>
       <Card className="mx-auto w-full">
         <CardHeader>
@@ -218,11 +215,10 @@ export default function RegisterForm() {
                   )}
                 />
 
-            
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isRegistering}
+                  disabled={isRegisteringToBackend}
                 >
                   Register
                 </Button>

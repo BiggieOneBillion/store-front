@@ -1,12 +1,28 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import StoreDetails from "./_components/store-details";
-import StoreSettingsView from "./store-settings/_component/store-settings-view";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+// import StoreSettingsView from "./store-settings/_component/store-settings-view";
 
 const AdminDashboard = () => {
+  const router = useRouter();
+  //! TODO: Check if the user is indeed an admin before rendering this page
+   const checkUser = async () => {
+       const user = await axios.get("/api/auth/user");
+       console.log(user.data);
+       if(user.data.role !== "admin") {
+           router.replace("/");
+       }
+           
+   }
+   useEffect(() => {
+      
+       checkUser();
+   }, []);
   return (
     <div className="space-y-6">
       <div>

@@ -3,7 +3,7 @@ import { getAllOrders } from "@/services/api/order";
 import { useUserStore } from "@/store/user-store";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { OrderTableDisplay } from "./order-table-display";
+import  OrderTableDisplay  from "./order-table-display";
 
 const OrderTable = () => {
   const { user } = useUserStore();
@@ -20,7 +20,7 @@ const OrderTable = () => {
     return <div>No orders found</div>;
   }
 
-  console.log(orders)
+  // console.log(orders)
 
   return (
     <div className="bg-white px-5 py-5 rounded-md">

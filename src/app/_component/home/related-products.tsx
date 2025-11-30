@@ -9,6 +9,7 @@ import { useCartStore } from "@/store/cart-store";
 import { toast } from "sonner";
 import SaveToWishlist from "./save-to-wishlist";
 import { Product } from "@/app/account/dashboard/product-management/_component/columns";
+import { Badge } from "@/components/ui/badge";
 
 interface RelatedProductsProps {
   productId: string;
@@ -16,7 +17,7 @@ interface RelatedProductsProps {
 }
 
 const RelatedProducts = ({ productId, categoryId }: RelatedProductsProps) => {
-  // console.log("PRODUCTS OOO", productId, categoryId)
+  // // console.log("PRODUCTS OOO", productId, categoryId)
   const { user } = useUserStore();
   const { addToCart } = useCartStore();
 
@@ -51,61 +52,73 @@ const RelatedProducts = ({ productId, categoryId }: RelatedProductsProps) => {
       <h2 className="text-2xl font-semibold mb-8">Related Products</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {relatedProducts.map((product: Product) => (
-          <div
+          <section
+            className={`${
+              product.inventory.quantity == 0 &&
+              "pointer-events-none cursor-not-allowed"
+            }`}
             key={product.id}
-            className="group relative bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
           >
-            <Link
-              href={`/product/${product.category.name}-${
-                product.id
-              }/${product.name.replaceAll(" ", "-")}-${product.category.id}`}
-            >
-              <div className="aspect-square overflow-hidden rounded-t-lg">
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
-                />
-              </div>
-            </Link>
-            <div className="p-4">
+            <div className="group relative bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
               <Link
                 href={`/product/${product.category.name}-${
                   product.id
                 }/${product.name.replaceAll(" ", "-")}-${product.category.id}`}
               >
-                <h3 className="text-sm font-medium text-gray-900 truncate">
-                  {product.name}
-                </h3>
-              </Link>
-              <p className="mt-1 text-sm text-gray-500 truncate">
-                {product.category.name}
-              </p>
-              <div className="mt-2 flex items-center justify-between">
-                <div className="flex flex-col">
-                  <span className="text-lg font-medium text-gray-900">
-                    ${product.price.toFixed(2)}
-                  </span>
-                  {product.discount?.active && (
-                    <span className="text-sm text-red-500 line-through">
-                      ${product.price.toFixed(2)}
-                    </span>
+                <div className="aspect-square overflow-hidden rounded-t-lg relative">
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-200"
+                  />
+                  {product.inventory.quantity == 0 && (
+                    <div className="absolute top-1 left-2">
+                      <Badge variant={"destructive"}>Out Of Stock</Badge>
+                    </div>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleAddToCart(product)}
-                    className="p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
-                  >
-                    <ShoppingCart className="w-4 h-4" />
-                  </button>
-                  <div className="border rounded-full p-2">
-                    <SaveToWishlist productId={product.id} />
+              </Link>
+              <div className="p-4">
+                <Link
+                  href={`/product/${product.category.name}-${
+                    product.id
+                  }/${product.name.replaceAll(" ", "-")}-${
+                    product.category.id
+                  }`}
+                >
+                  <h3 className="text-sm font-medium text-gray-900 truncate">
+                    {product.name}
+                  </h3>
+                </Link>
+                <p className="mt-1 text-sm text-gray-500 truncate">
+                  {product.category.name}
+                </p>
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-lg font-medium text-gray-900">
+                      ${product.price.toFixed(2)}
+                    </span>
+                    {product.discount?.active && (
+                      <span className="text-sm text-red-500 line-through">
+                        ${product.price.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleAddToCart(product)}
+                      className="p-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600 transition-colors"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                    </button>
+                    <div className="border rounded-full p-2">
+                      <SaveToWishlist productId={product.id} />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </section>
         ))}
       </div>
     </div>

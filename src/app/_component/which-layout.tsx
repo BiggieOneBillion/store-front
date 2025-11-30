@@ -20,6 +20,9 @@ const WhichLayout = ({ children }: { children: ReactNode }) => {
     "/account/dashboard/discount-management",
     "/account/dashboard/category-management",
     "/account/dashboard/stock-management",
+    "/account/dashboard/customization",
+    "/auth/forgot-password",
+    "/auth/reset-password"
   ];
 
   return path.includes(pathName) ? (
