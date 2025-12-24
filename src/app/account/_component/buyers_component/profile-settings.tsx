@@ -1,10 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,11 +16,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
-import { getUser, updateUserDetails } from "@/services/api/user";
+import { getUser } from "@/services/api/user";
 import { useUserStore } from "@/store/user-store";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import useUser from "@/hooks/useUser";
+import { getUserAddress } from "@/services/api/user-address";
+import { Address, AddressBookDialog } from "./user-address-book-dialog";
+import AddressCreateDialog from "./create-user-address";
+import { OtpDialogModal } from "./otp-dialog";
 
 const formSchema = z.object({
   name: z.string(),
@@ -41,7 +44,19 @@ export default function ProfileSettings() {
     queryFn: async () => await getUser(user?.id!, user?.token!),
   });
 
+  const {
+    data: userAddresses,
+    isLoading: isLoadingUserAddresses,
+    isError: errorLoadingUserAddresses,
+  } = useQuery({
+    queryKey: ["user-address", user?.id],
+    queryFn: async () =>
+      await getUserAddress({ userId: user?.id!, token: user?.token! }),
+  });
+
   const [isChecked, setIsChecked] = useState<boolean>(false);
+
+  const [openOtpModal, setOpenOtpModal] = useState(false);
 
   const { updateUser, isUpdatingUser, updateUserError } = useUser();
 
@@ -76,30 +91,42 @@ export default function ProfileSettings() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log(values);
 
-      const response = await updateUser({
+    try {
+      // // console.log(values);
+
+      await updateUser({
         userId: user?.id!,
         data: {
           name: values.name,
           email: values.email,
           phoneNumber: values.phoneNumber.toString(),
-          address: {
-            street: values.street,
-            city: values.city,
-            state: values.state,
-            zipCode: values.zipcode,
-            country: values.country,
-          },
         },
       });
       toast.success("Profile updated successfully");
+      // show dialog for otp mode
+      setOpenOtpModal(true);
     } catch (error) {
-      console.error("Form submission error", error);
       toast.error(`Please try again. ${updateUserError?.message}`);
     }
   }
+
+  const [addressOpen, setAddressOpen] = useState(false);
+  const [createAddressOpen, setCreateAddressOpen] = useState(false);
+
+  // optional: normalize addresses from your API shape to AddressBookDialog shape
+  const normalizedAddresses: Address[] =
+    (userAddresses || []).map((a: any) => ({
+      id: String(a.id ?? a._id ?? a.addressId),
+      label: a.label ?? a.tag ?? null,
+      street: a.street ?? a.address?.street ?? "",
+      city: a.city ?? a.address?.city ?? "",
+      state: a.state ?? a.address?.state ?? "",
+      country: a.country ?? a.address?.country ?? "",
+      zipCode: a.zipCode ?? a.address?.zipCode ?? "",
+      phoneNumber: a.phoneNumber ?? data?.phoneNumber ?? "",
+      isDefault: !!a.isDefault,
+    })) ?? [];
 
   useEffect(() => {
     if (data) {
@@ -200,113 +227,72 @@ export default function ProfileSettings() {
             )}
           />
 
-          <section className="space-y-5">
-            <h3 className="text-slate-100 font-medium text-sm bg-black px-2 py-1 w-fit rounded">
-              Address Information
-            </h3>
-            <section className="space-y-5">
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6">
-                  <FormField
-                    control={form.control}
-                    name="street"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Street</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter your street name"
-                            type=""
-                            {...field}
-                          />
-                        </FormControl>
+          {isLoadingUserAddresses && <p>...Loading address</p>}
+          {errorLoadingUserAddresses && (
+            <p className="text-red-500">Error loading address</p>
+          )}
 
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="col-span-6">
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter your city name"
-                            type=""
-                            {...field}
-                          />
-                        </FormControl>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6">
-                  <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State</FormLabel>
-                        <FormControl>
-                          <Input placeholder="" type="" {...field} />
-                        </FormControl>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="col-span-6">
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Country</FormLabel>
-                        <FormControl>
-                          <Input placeholder="" type="" {...field} />
-                        </FormControl>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="zipcode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Zip code</FormLabel>
-                    <FormControl>
-                      <Input placeholder="" type="" {...field} />
-                    </FormControl>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </section>
-          </section>
+          {userAddresses && userAddresses.length > 0 ? (
+            <div className="flex items-center justify-start gap-4">
+              <p className="text-sm text-black text-opacity-50">
+                You have {userAddresses.length} saved address
+                {userAddresses.length > 1 ? "es" : ""}
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                disabled={!isChecked}
+                onClick={() => setAddressOpen(true)}
+              >
+                Your Address
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                disabled={!isChecked}
+                onClick={() => setCreateAddressOpen(true)}
+              >
+                Add Address
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-start gap-4">
+              <p className="text-sm text-black text-opacity-50">
+                You have no saved address
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                disabled={!isChecked}
+                onClick={() => setCreateAddressOpen(true)}
+              >
+                Click to save
+              </Button>
+            </div>
+          )}
 
           <Button type="submit" disabled={!isChecked}>
             {isUpdatingUser ? "...Updating Record" : "Update Record"}
           </Button>
         </form>
       </Form>
+      {/* Dialog */}
+      <AddressBookDialog
+        open={addressOpen}
+        onOpenChange={setAddressOpen}
+        addresses={normalizedAddresses}
+        title="Manage your addresses"
+      />
+      <AddressCreateDialog
+        open={createAddressOpen}
+        onOpenChange={setCreateAddressOpen}
+        title="Add a new address"
+      />
+      <OtpDialogModal
+        form={form}
+        open={openOtpModal}
+        onOpenChange={setOpenOtpModal}
+      />
     </section>
   );
 }

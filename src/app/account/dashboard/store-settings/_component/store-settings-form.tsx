@@ -128,7 +128,7 @@ export default function StoreSettingsForm() {
 
         setIsChecked(!isChecked);
       } catch (error) {
-        console.error("Form submission error", error);
+        // console.error("Form submission error", error);
         toast.error(`Failed to submit the form: ${updateStoreError?.message}`);
       }
     });

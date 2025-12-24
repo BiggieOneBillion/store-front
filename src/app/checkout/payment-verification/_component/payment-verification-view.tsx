@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-
+"use client"
+import { useEffect, useState, Suspense } from "react";
 import axios from "axios";
 import { useSearchParams, useRouter } from "next/navigation";
 
-const PaymentVerificationView = () => {
+const PaymentVerificationContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [verifying, setVerifying] = useState(true);
@@ -54,6 +54,14 @@ const PaymentVerificationView = () => {
       <div className="status-message">{status}</div>
       {verifying && <div className="loading-spinner" />}
     </div>
+  );
+};
+
+const PaymentVerificationView = () => {
+  return (
+    <Suspense fallback={<div>Loading payment verification...</div>}>
+      <PaymentVerificationContent />
+    </Suspense>
   );
 };
 

@@ -4,9 +4,12 @@ import {
   IProduct,
   updateProduct,
 } from "@/services/api/product";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const useProduct = () => {
+  const queryClient = useQueryClient();
+
   const {
     mutateAsync: createProductFn,
     isPending: isCreatingProduct,
@@ -17,6 +20,15 @@ export const useProduct = () => {
       data: IProduct;
       userId: string;
     }) => createProduct(params),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["storeProducts"] });
+      toast.success("Product created successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to create product");
+      console.error("Create product error:", error);
+    },
   });
 
   const {
@@ -30,6 +42,35 @@ export const useProduct = () => {
       userId: string;
       productId: string;
     }) => updateProduct(params),
+    onMutate: async (params) => {
+      await queryClient.cancelQueries({ queryKey: ["products"] });
+      
+      const previousProducts = queryClient.getQueryData(["products"]);
+      
+      // Optimistically update the product
+      queryClient.setQueryData(["products"], (old: any) => {
+        if (!old) return old;
+        return old.map((product: any) =>
+          product.id === params.productId
+            ? { ...product, ...params.data }
+            : product
+        );
+      });
+
+      return { previousProducts };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["storeProducts"] });
+      toast.success("Product updated successfully");
+    },
+    onError: (error, _, context) => {
+      if (context?.previousProducts) {
+        queryClient.setQueryData(["products"], context.previousProducts);
+      }
+      toast.error("Failed to update product");
+      console.error("Update product error:", error);
+    },
   });
 
   const {
@@ -42,14 +83,39 @@ export const useProduct = () => {
       userId: string;
       productId: string;
     }) => deleteProduct(params),
+    onMutate: async (params) => {
+      await queryClient.cancelQueries({ queryKey: ["products"] });
+      
+      const previousProducts = queryClient.getQueryData(["products"]);
+      
+      // Optimistically remove the product
+      queryClient.setQueryData(["products"], (old: any) => {
+        if (!old) return old;
+        return old.filter((product: any) => product.id !== params.productId);
+      });
+
+      return { previousProducts };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["storeProducts"] });
+      toast.success("Product deleted successfully");
+    },
+    onError: (error, _, context) => {
+      if (context?.previousProducts) {
+        queryClient.setQueryData(["products"], context.previousProducts);
+      }
+      toast.error("Failed to delete product");
+      console.error("Delete product error:", error);
+    },
   });
 
   return {
-    // create store
+    // create product
     createProductFn,
     isCreatingProduct,
     createProductError,
-    // update store values
+    // update product
     updateProductFn,
     isUpdatingProduct,
     updateProductError,

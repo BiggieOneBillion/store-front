@@ -25,7 +25,7 @@ export function LoginForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const { register, handleSubmit } = useForm<IRegister>();
 
-  const { login, loginError, isLoggingIn } = useAuth();
+  const { login, loginError, isLoggingIn, loginToBackend } = useAuth();
 
   const setUser = useUserStore((state) => state.setUser);
 
@@ -36,16 +36,17 @@ export function LoginForm({
     password: string;
   }) => {
     try {
-      const response = await login(values);
-      console.log("RESPONSE", response);
+      const response = await loginToBackend(values);
+      // // console.log("RESPONSE", response.data.token);
       setUser({
-        id: response.user.id,
-        name: response.user.name,
-        role: response.user.role,
-        email: response.user.email,
-        token: response.tokens.access.token,
-        refreshToken: response.tokens.refresh.token,
+        id: response.data.user.id,
+        name: response.data.user.name,
+        role: response.data.user.role,
+        email: response.data.user.email,
+        token: response.data.token,
+        refreshToken: response.data.accessToken,
       });
+
       toast.success("Login successful");
       router.push("/");
     } catch (error) {
@@ -58,10 +59,12 @@ export function LoginForm({
       className={cn("flex flex-col items-center gap-6", className)}
       {...props}
     >
-      <h1 className="flex items-center gap-2">
-        <Store size={16} />
-        <span>MULTISTORE</span>
-      </h1>
+      <Link href={"/"}>
+        <h1 className="flex items-center gap-2">
+          <Store size={16} />
+          <span>MULTISTORE</span>
+        </h1>
+      </Link>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -85,12 +88,12 @@ export function LoginForm({
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
+                  <Link
+                    href="/auth/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <Input
                   id="password"

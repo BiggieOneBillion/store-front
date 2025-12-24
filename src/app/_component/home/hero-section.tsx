@@ -15,10 +15,10 @@ const HeroSection = () => {
     <Carousel>
       <CarouselContent>
         <CarouselItem>
-          <main className="h-[80vh] rounded-md bg-slate-50 grid grid-cols-2 gap-10 px-12">
+          <main className="h-[100vh] lg:[80vh] rounded-md bg-slate-50 flex flex-col  md:grid grid-cols-2 md:gap-10 px-12">
             {/* left side */}
             <section className="h-full flex flex-col justify-center items-start  gap-1">
-              <h1 className="text-2xl font-semibold max-w-[400px] font-sans">
+              <h1 className="text-4xl font-semibold max-w-[400px] font-sans">
                 Discover the latest collections <br />
                 From our top designers
               </h1>

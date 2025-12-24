@@ -35,7 +35,7 @@ export function DeleteWishListItemModal({ productId, storeId }: Props) {
       try {
         await deleteAWishList({
           productId,
-          storeId,
+          // storeId,
           token: user?.token!,
         });
         toast.success("Deleted Successfully");

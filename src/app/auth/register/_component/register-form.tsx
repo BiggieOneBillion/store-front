@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -25,12 +24,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Switch } from "@/components/ui/switch";
 import { Store } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserStore } from "@/store/user-store";
 import { useRouter } from "next/navigation";
-import { useStore } from "@/hooks/useStore";
 
 // Define validation schema using Zod
 const formSchema = z
@@ -39,7 +36,6 @@ const formSchema = z
       .string()
       .min(2, { message: "Name must be at least 2 characters long" }),
     email: z.string().email({ message: "Invalid email address" }),
-    isSeller: z.boolean(),
     phoneNumber: z
       .string()
       .min(11, { message: "Phone number must be 11 digits" })
@@ -64,48 +60,42 @@ export default function RegisterForm() {
       password: "",
       confirmPassword: "",
       phoneNumber: "",
-      isSeller: false,
     },
   });
 
-  const { user } = useUserStore();
-
-  const { register, isRegistering, registerError } = useAuth();
+  const { registerError, registerToBackend, isRegisteringToBackend } =
+    useAuth();
 
   const setUser = useUserStore((state) => state.setUser);
-
-  const { createStore, isCreatingStore, createStoreError } = useStore();
 
   const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       // Assuming an async registration function
-      const { confirmPassword, isSeller, ...others } = values;
-      // register the user
-      const response = await register({
+      const { confirmPassword, ...others } = values;
+
+      const response = await registerToBackend({
         ...others,
-        role: isSeller ? "seller" : "buyer",
+        role: "buyer",
       });
 
+      // console.log("REGISTERATION DETAILS---1", response);
+
       setUser({
-        id: response.user.id,
-        name: response.user.name,
-        role: response.user.role,
-        email: response.user.email,
-        token: response.tokens.access.token,
-        refreshToken: response.tokens.refresh.token,
+        id: response.data.user.id,
+        name: response.data.user.name,
+        role: response.data.user.role,
+        email: response.data.user.email,
+        token: response.data.token,
+        refreshToken: response.data.accessToken,
       });
 
       router.push("/");
       toast.success("Registration Completed");
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error(
-        `Error Registering ${
-          registerError?.message || createStoreError?.message
-        }`
-      );
+      // console.error("Form submission error", error);
+      toast.error(`Error Registering ${registerError?.message}`);
     }
   }
 
@@ -113,7 +103,7 @@ export default function RegisterForm() {
     <div className="flex flex-col gap-4 min-h-[60vh] h-full w-full items-center justify-center px-4">
       <h1 className="flex items-center gap-2">
         <Store size={16} />
-        <span>STOREFRONT</span>
+        <span>MULTISTORE</span>
       </h1>
       <Card className="mx-auto w-full">
         <CardHeader>
@@ -225,39 +215,10 @@ export default function RegisterForm() {
                   )}
                 />
 
-                {/* isSeller */}
-                <FormField
-                  control={form.control}
-                  name="isSeller"
-                  render={({ field }) => (
-                    <FormItem className="flexY hidden flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel>Click to register as seller</FormLabel>
-                        <FormDescription className="flex flex-col">
-                          <span>
-                            You can create stores and sell your products
-                          </span>
-                          <span className="underline underline-offset-1 text-black font-medium">
-                            Terms and conditions apply
-                          </span>
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          //   disabled
-                          aria-readonly
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isRegistering}
+                  disabled={isRegisteringToBackend}
                 >
                   Register
                 </Button>

@@ -1,28 +1,43 @@
 "use client";
-import { useUserStore } from "@/store/user-store";
-import CheckOutPageView from "./_component/check-out-page-view";
-import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
 
-export default function CheckoutPage() {
-  const { user } = useUserStore();
-  const [isLoading, setIsLoading] = useState(true);
+import React, { Suspense, useEffect } from "react";
+import CheckOutPageView from "./_component/check-out-page-view";
+import { useUserStore } from "@/store/user-store";
+import { useRouter } from "next/navigation";
+import { useCartStore } from "@/store/cart-store";
+
+const CheckOutPage = () => {
+  const token = useUserStore().user?.token || "";
+  const isHydrated = useUserStore().hasHydrated;
+  const router = useRouter();
+  const { cart } = useCartStore();
 
   useEffect(() => {
-    setIsLoading(false);
-  }, []);
+    if (isHydrated) {
+      // Check if the user is authenticated
+      if (!token) {
+        // Redirect to auth page if not authenticated
+        router.push("/auth");
+      }
 
-  if (isLoading) {
-    return <div>Loading...</div>; 
+      if (cart.length === 0) {
+        router.replace("/shop");
+        // return null;
+      }
+    }
+  }, [isHydrated]);
+
+  if (!isHydrated) {
+    return <p>...Loading!!</p>;
   }
 
-  if (!user) {
-    redirect("/auth");
-  }
+  // If authenticated, render the checkout page view
 
-  if (user.role === "seller") {
-    redirect("/");
-  }
+  return (
+    <Suspense fallback={<div>Loading checkout...</div>}>
+      <CheckOutPageView />
+    </Suspense>
+  );
+};
 
-  return <CheckOutPageView />;
-}
+export default CheckOutPage;

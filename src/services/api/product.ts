@@ -28,6 +28,33 @@ export interface IProduct {
   }[];
 }
 
+export const getProductDetails = async (id: string, token: string) => {
+  const response = await api.get(`${baseURL}/detail/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
+export const getRelatedProduct = async (params: {
+  productId: string;
+  token: string;
+  categoryId: string;
+}) => {
+  const response = await api.get(
+    `${baseURL}/related/${params.productId}/${params.categoryId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${params.token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
 export const getStoreProducts = async (userId: string, token: string) => {
   const response = await api.get(`${baseURL}/${userId}`, {
     headers: {
@@ -112,5 +139,14 @@ export const getAllStoreProducts = async (
     },
   });
 
+  return response.data;
+};
+
+export const filterProducts = async (param: { name: string }) => {
+  const response = await api.get(`${baseURL}/filter?name=${param.name}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
   return response.data;
 };

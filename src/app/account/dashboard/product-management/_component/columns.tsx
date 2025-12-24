@@ -4,7 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, CircleOff, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,41 +15,51 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EditProductDialog } from "./edit-product-dialog";
 import { DeleteProductAlert } from "./delete-product-alert";
+import { DiscountDetailsDialog } from "./discount-details-dialog";
 
 // This type defines the shape of our data based on the provided schema.
 export type Product = {
   id: string;
   name: string;
   description: string;
-  store: {
-    name: string;
-    id: string;
-  };
-  category: string;
+  store: string;
+  category: { name: string; id: string };
   price: number;
   compareAtPrice?: number;
   images: string[];
+  tag: "latest" | "featured" | "regular" | "sale";
   inventory: {
     quantity: number;
     sku: string;
     lowStockThreshold: number;
   };
+  discount?: {
+    type?: "percentage" | "fixed";
+    value?: number;
+    active?: boolean;
+    startDate?: string;
+    endDate?: string;
+  };
   variants: Array<{
+    _id: string;
     name: string;
     options: string[];
     price: number;
     quantity: number;
     sku: string;
+    discount: {
+      type: "percentage" | "fixed";
+      value: number;
+      active: boolean;
+    };
   }>;
   specifications: Array<{
     name: string;
     value: string;
   }>;
-  status: "active" | "inactive" | "out_of_stock";
+  status: "active" | "inactive" | "out_of_stock" | "deactivated";
   rating: number;
   totalRatings: number;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export const columns: ColumnDef<Product>[] = [
@@ -152,13 +162,11 @@ export const columns: ColumnDef<Product>[] = [
     },
     cell: ({ row }) => {
       const quantity = row.original.inventory.quantity;
-      console.log(row.original);
-
-      return <div className="text-left w-fit">{quantity}</div>;
+      return <div className="text-left pl-6">{quantity}</div>;
     },
   },
   {
-    accessorKey: "category",
+    accessorKey: "category.name",
     header: "Category",
   },
   //   {
@@ -193,9 +201,40 @@ export const columns: ColumnDef<Product>[] = [
   //     },
   //   },
   {
+    accessorKey: "discount",
+    header: "Discount",
+    cell: ({ row }) => {
+      const discount = row.original.discount;
+
+      if (!discount?.active) {
+        return <Badge variant="outline">No Discount</Badge>;
+      }
+
+      return (
+        <DiscountDetailsDialog discount={discount}>
+          <Badge
+            variant="secondary"
+            className="cursor-pointer hover:bg-secondary/80"
+          >
+            {discount.type === "percentage"
+              ? `${discount.value}% Off`
+              : `$${discount.value} Off`}
+          </Badge>
+        </DiscountDetailsDialog>
+      );
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const product = row.original;
+      if (product.status === "deactivated") {
+        return (
+          <Badge variant="outline">
+            <CircleOff className="h-4 w-4" />
+          </Badge>
+        );
+      }
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -206,19 +245,20 @@ export const columns: ColumnDef<Product>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
+            {/* <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(product.id)}
             >
               Copy product ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem>View details</DropdownMenuItem> */}
             {/* <DropdownMenuItem> */}
             {/* Edit */}
             <EditProductDialog
               productId={product.id}
               data={{
-                category: product.category,
+                category: product.category.name,
+                categoryId: product.category.id,
                 name: product.name,
                 description: product.description,
                 price: product.price,
@@ -227,6 +267,11 @@ export const columns: ColumnDef<Product>[] = [
                 compareAtPrice: product.compareAtPrice,
                 specifications: product.specifications,
                 variants: product.variants,
+                tag: product.tag.toLowerCase() as
+                  | "latest"
+                  | "featured"
+                  | "regular"
+                  | "sale",
                 // imageFiles: [product.images],
               }}
             />

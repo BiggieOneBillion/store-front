@@ -1,23 +1,42 @@
+"use client";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserStore } from "@/store/user-store";
+import { set } from "date-fns";
 import { Loader2, LogIn, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const Logout = () => {
   const { hasHydrated, user } = useUserStore();
 
-  const { logOut, isLoggingOut, logoutError } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { clearUser } = useUserStore();
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
-      await logOut(user?.refreshToken!);
+      const res = await fetch("/api/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          refreshToken: user?.refreshToken,
+          userId: user?.id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed To Logout");
+      }
       clearUser();
       toast.success("Logged Out");
-    } catch (error) {
-      toast.error(`Failed To Logout, ${logoutError?.message}`);
+    } catch (error: any) {
+      toast.error(error.message || "Failed To Logout");
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -28,6 +47,8 @@ const Logout = () => {
       </p>
     );
   }
+
+  // // console.log("user", user);
 
   return (
     <>

@@ -1,37 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multi-Store E-Commerce Platform
 
-## Getting Started
+A comprehensive multi-vendor e-commerce platform built with Next.js 15, enabling sellers to manage their stores and buyers to shop across multiple vendors in a unified marketplace.
 
-First, run the development server:
+## 🌟 Overview
+
+Multi-Store is a modern, full-featured e-commerce platform that supports multiple vendors (sellers) and provides a seamless shopping experience for buyers. The platform includes robust product management, inventory tracking, order processing, payment integration, and comprehensive analytics.
+
+## ✨ Key Features
+
+### For Buyers
+- Product discovery with advanced filtering and search
+- Shopping cart and wishlist
+- Secure checkout with Paystack integration
+- Order tracking and history
+- User account management
+
+### For Sellers
+- Complete store management
+- Product management with variants and specifications
+- Real-time inventory tracking with low-stock alerts
+- Order processing and fulfillment
+- Discount and promotion management
+- Sales analytics and reporting
+- Category and customer management
+
+## 🚀 Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env and add your NEXT_PUBLIC_BACKEND_URL
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📚 Documentation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Comprehensive documentation is available in the `docs/` directory:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **[Overview & Getting Started](./docs/README.md)** - Project overview and quick start guide
+- **[Architecture](./docs/ARCHITECTURE.md)** - System architecture, design patterns, and data flows
+- **[Tech Stack](./docs/TECH_STACK.md)** - Technologies, libraries, and tools used
+- **[Features](./docs/FEATURES.md)** - Detailed feature documentation for buyers and sellers
+- **[API Integration](./docs/API_INTEGRATION.md)** - Backend API integration guide with all endpoints
+- **[Components](./docs/COMPONENTS.md)** - Component structure, patterns, and best practices
+- **[Development Guide](./docs/DEVELOPMENT.md)** - Development workflow and guidelines
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Radix UI + shadcn/ui
+- **State Management**: Zustand + TanStack Query
+- **Forms**: React Hook Form + Zod
+- **Payment**: Paystack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+client/
+├── docs/                   # Comprehensive documentation
+├── src/
+│   ├── app/               # Next.js app router pages
+│   ├── components/        # Reusable UI components
+│   ├── hooks/            # Custom React hooks
+│   ├── services/         # API service layer
+│   ├── store/            # State management
+│   └── types/            # TypeScript types
+└── public/               # Static assets
+```
 
-## Deploy on Vercel
+## 📦 Available Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev      # Start development server with Turbopack
+npm run build    # Build for production
+npm run start    # Start production server
+npm run lint     # Run ESLint
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# store-front
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+See [Development Guide](./docs/DEVELOPMENT.md) for detailed workflow.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**For detailed documentation, please visit the [docs](./docs/) directory.**

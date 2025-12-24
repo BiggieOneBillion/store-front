@@ -4,8 +4,8 @@ import { Order } from "@/types/orders";
 
 const baseURL = "/order";
 
-export const getAllOrders = async (storeId: string, token: string) => {
-  const response = await api.get(`${baseURL}/${storeId}`, {
+export const getAllOrders = async (token: string) => {
+  const response = await api.get(`${baseURL}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -38,8 +38,11 @@ export const createOrder = async (params: { token: string; data: Order }) => {
 };
 
 // Get all the orders of a user
-export const getUsersOrder = async (params: { token: string }) => {
-  const response = await api.get(`${baseURL}`, {
+export const getUsersOrder = async (params: {
+  token: string;
+  userId: string;
+}) => {
+  const response = await api.get(`${baseURL}/${params.userId}`, {
     headers: {
       Authorization: `Bearer ${params.token}`,
     },
@@ -105,5 +108,21 @@ export const getAllStoreProducts = async (
     },
   });
 
+  return response.data;
+};
+
+export const cancelOrder = async (params: {
+  token: string;
+  orderId: string;
+}) => {
+  const response = await api.patch(
+    `${baseURL}/cancel/${params.orderId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${params.token}`,
+      },
+    }
+  );
   return response.data;
 };

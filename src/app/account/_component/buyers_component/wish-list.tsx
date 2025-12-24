@@ -2,22 +2,23 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ToolTip } from "@/global-components/tool-tip";
 import { getUserWishList } from "@/services/api/wishlist";
 import { useUserStore } from "@/store/user-store";
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingCart, Trash2 } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import Image from "next/image";
 import { v4 } from "uuid";
 import { DeleteWishListItemModal } from "./delete-wish-list-item-modal";
-import { Button } from "@/components/ui/button";
 import { ClearWishListModal } from "./clear-wish-list-modal";
+import { ProductCardSkeletonGrid } from "@/components/global/skeletons";
+import { ErrorMessage } from "@/components/global/error-message";
+import { EmptyState } from "@/components/global/empty-state";
 
 type SimpleProduct = {
   images: string[];
   name: string;
   description: string;
-  category: string;
+  category: { name: string };
   price: number;
   id: string;
 };
@@ -45,24 +46,54 @@ const WishList = () => {
     data,
     isLoading,
     isError,
-  }: { data: SimpleCart | undefined; isLoading: boolean; isError: boolean } =
-    useQuery({
-      queryKey: ["user-wish-list"],
-      queryFn: async () => await getUserWishList(user?.id!, user?.token!),
-    });
+    error,
+    refetch,
+  }: { 
+    data: SimpleCart | undefined; 
+    isLoading: boolean; 
+    isError: boolean;
+    error: any;
+    refetch: () => void;
+  } = useQuery({
+    queryKey: ["user-wish-list"],
+    queryFn: async () => await getUserWishList(user?.id!, user?.token!),
+  });
 
   if (isLoading) {
-    return <p>...Loading</p>;
+    return (
+      <div className="mt-2">
+        <ProductCardSkeletonGrid count={6} />
+      </div>
+    );
   }
 
   if (isError) {
-    return <p>Error while fetching wish list</p>;
+    return (
+      <ErrorMessage
+        title="Failed to Load Wishlist"
+        message="We couldn't load your wishlist items"
+        error={error}
+        onRetry={refetch}
+      />
+    );
+  }
+
+  if (!data || data.products.length === 0) {
+    return (
+      <EmptyState
+        icon={<Heart className="h-12 w-12 text-muted-foreground" />}
+        title="Your Wishlist is Empty"
+        description="Save items you love to your wishlist and shop them later"
+        actionLabel="Browse Products"
+        actionHref="/shop"
+      />
+    );
   }
 
   return (
     <section className="mt-2">
       <div>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           This is a list of your wish list and when you are ready, <br /> click
           on the (Add To Cart) button to add it to your cart.
         </p>
@@ -96,7 +127,7 @@ const WishList = () => {
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary" className="mb-2">
-                        {el.product.category}
+                        {el.product.category.name}
                       </Badge>
                     </div>
                     <p className="text-lg font-bold">
@@ -119,9 +150,6 @@ const WishList = () => {
             </div>
           ))}
       </section>
-      {data && data.products && data.products.length === 0 && (
-        <p className="font-bold text-black/10 text-2xl">No products found</p>
-      )}
     </section>
   );
 };

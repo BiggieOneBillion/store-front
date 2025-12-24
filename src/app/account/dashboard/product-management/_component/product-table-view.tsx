@@ -24,17 +24,19 @@ import { CreateNewProductDialog } from "./create-new-product-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { getStoreProducts } from "@/services/api/product";
 import { useUserStore } from "@/store/user-store";
+import { DataTableSkeleton } from "@/components/global/skeletons";
+import { ErrorMessage } from "@/components/global/error-message";
 
 export default function ProductsTableView() {
 
   const { user } = useUserStore();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["store-products"],
     queryFn: async () => await getStoreProducts(user?.id!, user?.token!),
   });
 
   return (
-    <Card>
+    <Card className="w-full overflow-auto">
       <CardHeader>
         <section className="flex items-center justify-between">
           <section>
@@ -45,7 +47,7 @@ export default function ProductsTableView() {
             <div className="ml-auto flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8 gap-1">
+                  <Button variant="outline" size="sm" className="h-8 gap-1 hidden">
                     <ListFilter className="h-3.5 w-3.5" />
                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                       Filter
@@ -62,7 +64,7 @@ export default function ProductsTableView() {
                   <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button size="sm" variant="outline" className="h-8 gap-1">
+              <Button size="sm" variant="outline" className="h-8 gap-1 hidden">
                 <File className="h-3.5 w-3.5" />
                 <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                   Export
@@ -74,8 +76,16 @@ export default function ProductsTableView() {
         </section>
       </CardHeader>
       <CardContent>
-        {isLoading && <p className="text-sm">...Loading</p>}
-        {isError && <p className="text-sm">Error loading data</p>}
+        {isLoading && <DataTableSkeleton columnCount={6} rowCount={10} />}
+        {isError && (
+          <ErrorMessage
+            title="Failed to Load Products"
+            message="We couldn't load your products"
+            error={error}
+            onRetry={refetch}
+            showHomeButton={false}
+          />
+        )}
         {data && Array.isArray(data) && (
           <DataTable columns={columns} data={data} />
         )}

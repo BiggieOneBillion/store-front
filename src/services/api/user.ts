@@ -13,6 +13,16 @@ interface IUserAddress {
   zipCode: string;
 }
 
+
+export interface IUserUpdate {
+  name: string;
+  email: string;
+  role: string;
+  phoneNumber: string;
+  token?: string;
+}
+
+
 export interface IUser {
   name: string;
   email: string;
@@ -55,5 +65,15 @@ export const deleteUserDetails = async (params: {
     },
   });
 
+  return response.data;
+};
+
+export const getAllUsers = async (token: string) => {
+  const response = await api.get(`${baseURL}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
   return response.data;
 };
